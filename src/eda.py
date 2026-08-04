@@ -1,4 +1,4 @@
-"""EDA helpers for Brazil school-risk marts."""
+"""EDA helpers for the Brazil school-risk marts (used by notebooks/ and ad-hoc analysis)."""
 
 from __future__ import annotations
 
@@ -20,15 +20,15 @@ def missingness_table(df: pd.DataFrame) -> pd.DataFrame:
     return miss.sort_values("pct_missing", ascending=False)
 
 
-def summary_by_uf(df: pd.DataFrame, min_n: int = 30) -> pd.DataFrame:
+def summary_by_state(df: pd.DataFrame, min_n: int = 30) -> pd.DataFrame:
     g = (
-        df.groupby("uf", as_index=False)
+        df.groupby("state_code", as_index=False)
         .agg(
             n=("target_dropout_rate", "size"),
-            mean_abandono=("target_dropout_rate", "mean"),
-            median_abandono=("target_dropout_rate", "median"),
+            mean_dropout_rate=("target_dropout_rate", "mean"),
+            median_dropout_rate=("target_dropout_rate", "median"),
         )
-        .sort_values("mean_abandono", ascending=False)
+        .sort_values("mean_dropout_rate", ascending=False)
     )
     return g.loc[g["n"] >= min_n]
 
@@ -47,11 +47,12 @@ def compare_levels() -> pd.DataFrame:
                 "level": level,
                 "rows": len(df),
                 "schools": df["school_id"].nunique(),
-                "mean_abandono": float(df["target_dropout_rate"].mean()),
-                "median_abandono": float(df["target_dropout_rate"].median()),
-                "p90_abandono": float(df["target_dropout_rate"].quantile(0.9)),
+                "mean_dropout_rate": float(df["target_dropout_rate"].mean()),
+                "median_dropout_rate": float(df["target_dropout_rate"].median()),
+                "p90_dropout_rate": float(df["target_dropout_rate"].quantile(0.9)),
                 "public_share": float(df["is_public"].mean()) if "is_public" in df else None,
                 "rural_share": float(df["is_rural"].mean()) if "is_rural" in df else None,
+                "share_with_history": float(df["has_history"].mean()) if "has_history" in df else None,
             }
         )
     return pd.DataFrame(rows)

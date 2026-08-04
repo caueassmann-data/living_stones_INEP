@@ -1,76 +1,273 @@
 {
-  "model_version": "0.2.0",
+  "model_version": "0.3.0",
   "education_level": "medio",
-  "trained_at_utc": "2026-07-31T03:10:08.924319+00:00",
-  "n_rows": 80000,
-  "n_train": 64000,
-  "n_test": 16000,
+  "trained_at_utc": "2026-08-04T20:26:42.283835+00:00",
+  "n_rows": 225199,
+  "n_train": 179812,
+  "n_test": 45387,
   "selected_model": "random_forest",
   "cv_leaderboard": [
     {
       "model": "random_forest",
-      "cv_mae_mean": 3.251649922583309,
-      "cv_mae_std": 0.020035984047154284
+      "cv_mae_mean": 2.4917108320453862,
+      "cv_mae_std": 0.014138582160013872,
+      "is_baseline": false
     },
     {
       "model": "xgboost",
-      "cv_mae_mean": 3.2572476109130464,
-      "cv_mae_std": 0.018611053207966275
+      "cv_mae_mean": 2.5150195526990378,
+      "cv_mae_std": 0.015455920587125136,
+      "is_baseline": false
     },
     {
       "model": "ridge",
-      "cv_mae_mean": 3.3715480503105226,
-      "cv_mae_std": 0.011138725545387945
+      "cv_mae_mean": 3.060670350740849,
+      "cv_mae_std": 0.017496828679153056,
+      "is_baseline": false
+    },
+    {
+      "model": "dummy_median",
+      "cv_mae_mean": 3.2915430901186236,
+      "cv_mae_std": 0.024168280468684532,
+      "is_baseline": true
+    },
+    {
+      "model": "dummy_mean",
+      "cv_mae_mean": 3.9415828074154655,
+      "cv_mae_std": 0.01585940840465459,
+      "is_baseline": true
     }
   ],
+  "beats_baseline_cv": true,
+  "beats_baseline_test": true,
   "test_metrics": {
-    "mae": 3.342890522528931,
-    "rmse": 5.864867688273982,
-    "r2": 0.12217686053301069
+    "mae": 2.509981770669985,
+    "rmse": 4.744205674673765,
+    "r2": 0.38238248729151647
+  },
+  "test_ranking_metrics": {
+    "base_rate_high_risk": 0.33930420605019057,
+    "average_precision": 0.7492300834653345,
+    "by_k": {
+      "top_10pct": {
+        "k_rows": 4539,
+        "precision": 0.8288169200264376,
+        "recall": 0.24428571428571427,
+        "lift": 2.4426956850155794
+      },
+      "top_20pct": {
+        "k_rows": 9077,
+        "precision": 0.7820865924865044,
+        "recall": 0.460974025974026,
+        "lift": 2.304971699557466
+      },
+      "top_33pct": {
+        "k_rows": 14978,
+        "precision": 0.711710508746161,
+        "recall": 0.6922077922077922,
+        "lift": 2.097558757172858
+      }
+    }
+  },
+  "baseline_test_metrics": {
+    "mae": 3.93298686206589,
+    "rmse": 6.03675722493391,
+    "r2": -1.3462672754371852e-08,
+    "ranking": {
+      "base_rate_high_risk": 0.33930420605019057,
+      "average_precision": 0.33930420605019057,
+      "by_k": {
+        "top_10pct": {
+          "k_rows": 4539,
+          "precision": 0.4635382242784754,
+          "recall": 0.13662337662337662,
+          "lift": 1.3661434665796859
+        },
+        "top_20pct": {
+          "k_rows": 9077,
+          "precision": 0.457530020932026,
+          "recall": 0.2696753246753247,
+          "lift": 1.3484360428598614
+        },
+        "top_33pct": {
+          "k_rows": 14978,
+          "precision": 0.3741487515022032,
+          "recall": 0.3638961038961039,
+          "lift": 1.1026941158721102
+        }
+      }
+    }
+  },
+  "subgroup_metrics": {
+    "location": [
+      {
+        "group": "Rural",
+        "n": 4570,
+        "mae": 4.2350549545123215,
+        "rmse": 7.19412161636993,
+        "mean_error": -0.0553743594678812
+      },
+      {
+        "group": "Urban",
+        "n": 40817,
+        "mae": 2.316837138527508,
+        "rmse": 4.385521699577059,
+        "mean_error": 0.036786777657995935
+      }
+    ],
+    "admin_network": [
+      {
+        "group": "Public",
+        "n": 32907,
+        "mae": 3.2250643885328616,
+        "rmse": 5.3570682108936145,
+        "mean_error": 0.04189883130345152
+      },
+      {
+        "group": "Private",
+        "n": 12480,
+        "mae": 0.6244670506368363,
+        "rmse": 2.4867651473481183,
+        "mean_error": -0.01044068596189714
+      }
+    ],
+    "school_size": [
+      {
+        "group": ">700 students",
+        "n": 3042,
+        "mae": 3.3994070051782646,
+        "rmse": 5.500632021436371,
+        "mean_error": -0.01817490027615552
+      },
+      {
+        "group": "301-700 students",
+        "n": 11560,
+        "mae": 2.6295392057161457,
+        "rmse": 4.396044334625168,
+        "mean_error": 0.07903627894774758
+      },
+      {
+        "group": "101-300 students",
+        "n": 17164,
+        "mae": 2.473790650111143,
+        "rmse": 4.6120653187085425,
+        "mean_error": 0.028374166112245372
+      },
+      {
+        "group": "<=100 students",
+        "n": 13621,
+        "mae": 2.255482753032819,
+        "rmse": 5.0035472840120905,
+        "mean_error": -0.007115516059633886
+      }
+    ]
+  },
+  "temporal_holdout": {
+    "description": "Trained on years <= 2023, evaluated on years [2024, 2025] — the model never sees these rows or any row from these years during training.",
+    "n_train": 167600,
+    "n_test": 57599,
+    "metrics": {
+      "mae": 2.2549345790260724,
+      "rmse": 3.9733536394280278,
+      "r2": 0.13235757653731095,
+      "ranking": {
+        "base_rate_high_risk": 0.2825743502491363,
+        "average_precision": 0.603260957160587,
+        "by_k": {
+          "top_10pct": {
+            "k_rows": 5760,
+            "precision": 0.6762152777777778,
+            "recall": 0.23930941263209635,
+            "lift": 2.3930525795479367
+          },
+          "top_20pct": {
+            "k_rows": 11520,
+            "precision": 0.64296875,
+            "recall": 0.45508724502334724,
+            "lift": 2.2753967210156056
+          },
+          "top_33pct": {
+            "k_rows": 19008,
+            "precision": 0.5791771885521886,
+            "recall": 0.6763946915704104,
+            "lift": 2.0496452988091365
+          }
+        }
+      }
+    },
+    "baseline_metrics": {
+      "mae": 3.3652370628471946,
+      "rmse": 4.503080424462339,
+      "r2": -0.11441191120904026,
+      "ranking": {
+        "base_rate_high_risk": 0.2825743502491363,
+        "average_precision": 0.2825743502491363,
+        "by_k": {
+          "top_10pct": {
+            "k_rows": 5760,
+            "precision": 0.34392361111111114,
+            "recall": 0.12171295158515606,
+            "lift": 1.2171083851307993
+          },
+          "top_20pct": {
+            "k_rows": 11520,
+            "precision": 0.3703125,
+            "recall": 0.2621037109855001,
+            "lift": 1.3104958028692553
+          },
+          "top_33pct": {
+            "k_rows": 19008,
+            "precision": 0.3399095117845118,
+            "recall": 0.39696485623003197,
+            "lift": 1.202902922663805
+          }
+        }
+      }
+    }
   },
   "target": "target_dropout_rate",
-  "target_definition": "inep_taxa_abandono_official",
-  "seconds": 16.51,
+  "target_definition": "inep_official_dropout_rate",
+  "seconds": 181.18,
   "feature_importance_top": [
     {
-      "feature": "qt_mat_bas",
-      "importance": 0.18551774000192045
+      "feature": "dropout_rate_3yr_avg",
+      "importance": 0.4182080436671908
+    },
+    {
+      "feature": "state_dropout_rate_lag1",
+      "importance": 0.06900282482544823
+    },
+    {
+      "feature": "overage_enrollment_share",
+      "importance": 0.06807332918799178
+    },
+    {
+      "feature": "dropout_rate_lag1",
+      "importance": 0.0547524416201003
+    },
+    {
+      "feature": "approval_rate_lag1",
+      "importance": 0.028090654686138243
+    },
+    {
+      "feature": "failure_rate_lag1",
+      "importance": 0.027452067293282124
+    },
+    {
+      "feature": "is_covid_year",
+      "importance": 0.021979066077537246
     },
     {
       "feature": "student_teacher_ratio",
-      "importance": 0.16636552674107613
-    },
-    {
-      "feature": "enrollment_level",
-      "importance": 0.14867673017537977
-    },
-    {
-      "feature": "tp_dependencia",
-      "importance": 0.1216727020809618
-    },
-    {
-      "feature": "qt_doc_bas",
-      "importance": 0.11309756593566077
+      "importance": 0.018011468183550074
     },
     {
       "feature": "is_public",
-      "importance": 0.11180553243313243
+      "importance": 0.017760858379799238
     },
     {
-      "feature": "in_agua",
-      "importance": 0.04443031474114604
-    },
-    {
-      "feature": "in_internet",
-      "importance": 0.030327968317035055
-    },
-    {
-      "feature": "in_esgoto",
-      "importance": 0.02094083758720267
-    },
-    {
-      "feature": "in_lab_info",
-      "importance": 0.015098396084984365
+      "feature": "dropout_rate_lag2",
+      "importance": 0.017206677124302846
     }
   ]
 }

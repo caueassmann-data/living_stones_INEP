@@ -1,6 +1,7 @@
 {
-  "model_version": "0.2.0",
+  "model_version": "0.3.0",
   "level": "fundamental",
-  "selected_model": "xgboost",
-  "limitation": "School-level Brazil INEP abandonment model; not student-level scoring."
+  "selected_model": "random_forest",
+  "beats_trivial_baseline": true,
+  "limitation": "School-level Brazil INEP dropout-rate model; not student-level scoring."
 }

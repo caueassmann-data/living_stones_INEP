@@ -1,1 +1,1 @@
-"""ETL package for LATAM Educational Risk Model."""
+"""ETL package: builds the Brazil school-risk marts from INEP source data."""

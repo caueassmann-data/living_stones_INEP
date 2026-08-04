@@ -24,7 +24,7 @@ def main() -> None:
     parser.add_argument("--level", choices=["fundamental", "medio"], default="fundamental")
     parser.add_argument(
         "--query",
-        choices=["summary", "top_uf", "head"],
+        choices=["summary", "top_states", "head"],
         default="summary",
     )
     args = parser.parse_args()
@@ -36,13 +36,13 @@ def main() -> None:
                 "rows": len(df),
                 "schools": int(df["school_id"].nunique()),
                 "years": sorted(df["year"].dropna().astype(int).unique().tolist()),
-                "mean_abandono": float(df["target_dropout_rate"].mean()),
-                "median_abandono": float(df["target_dropout_rate"].median()),
+                "mean_dropout_rate": float(df["target_dropout_rate"].mean()),
+                "median_dropout_rate": float(df["target_dropout_rate"].median()),
             }
         )
-    elif args.query == "top_uf":
+    elif args.query == "top_states":
         g = (
-            df.groupby("uf")
+            df.groupby("state_code")
             .agg(n=("target_dropout_rate", "size"), mean=("target_dropout_rate", "mean"))
             .sort_values("mean", ascending=False)
             .head(15)

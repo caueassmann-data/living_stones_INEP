@@ -1,4 +1,4 @@
-"""Streamlit app — Ensino Médio school abandonment early-warning."""
+"""Streamlit app — Ensino Medio school dropout early-warning."""
 
 from __future__ import annotations
 
@@ -11,4 +11,4 @@ if str(ROOT) not in sys.path:
 
 from app.ui_common import run_app
 
-run_app("medio", "Brazil School Risk — Ensino Médio")
+run_app("medio", "Brazil School Risk — Ensino Medio")

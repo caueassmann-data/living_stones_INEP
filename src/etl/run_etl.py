@@ -1,4 +1,10 @@
-"""Brazil school-risk ETL entrypoint (Fundamental + Médio)."""
+"""Brazil school-risk ETL entrypoint (Fundamental + Medio).
+
+Run this after scripts/download_inep_rendimento.py and
+scripts/stage_inep_rendimento.py have produced staged attainment-rate
+Parquet files. It builds the two modeling marts under
+latam_education_data/marts/school_risk_br_{fundamental,medio}/.
+"""
 
 from __future__ import annotations
 
@@ -12,20 +18,23 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.etl.build_school_risk_marts import build_school_risk_br, build_school_risk_br_level
-from src.etl.config import discover_brasil_years, ensure_dirs
+from src.etl.config import discover_brazil_years, ensure_dirs
 from src.etl.utils import write_json
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Build Brazil school-risk marts (Fundamental + Médio)"
+        description="Build Brazil school-risk marts (Fundamental + Medio)"
     )
     parser.add_argument(
-        "--brasil-years",
+        "--brazil-years",
         type=int,
         nargs="*",
         default=None,
-        help="Census / rendimento years (default: auto intersection of staged rendimento + Censo)",
+        help=(
+            "School Census / attainment-rate years to include "
+            "(default: auto intersection of staged attainment-rate years and Census years)"
+        ),
     )
     parser.add_argument(
         "--level",
@@ -36,13 +45,13 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     ensure_dirs()
-    years = args.brasil_years if args.brasil_years else discover_brasil_years(min_year=2016)
+    years = args.brazil_years if args.brazil_years else discover_brazil_years(min_year=2016)
     print("Years:", years)
 
     t0 = time.time()
     report: dict = {"years": years, "steps": {}}
 
-    print("== School risk BR (official INEP abandonment) ==")
+    print("== Building Brazil school-risk marts (official INEP dropout rates) ==")
     t = time.time()
     if args.level == "both":
         outs = build_school_risk_br(years=years)

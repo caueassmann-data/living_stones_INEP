@@ -11,12 +11,12 @@
   ],
   "steps": {
     "school_risk_br": {
-      "seconds": 199.9,
+      "seconds": 306.82,
       "outputs": {
         "fundamental": "C:\\Users\\User\\Desktop\\Projeto Living Stone Foundation\\latam_education_data\\marts\\school_risk_br_fundamental\\school_risk_br_fundamental.parquet",
         "medio": "C:\\Users\\User\\Desktop\\Projeto Living Stone Foundation\\latam_education_data\\marts\\school_risk_br_medio\\school_risk_br_medio.parquet"
       }
     }
   },
-  "total_seconds": 199.9
+  "total_seconds": 306.82
 }

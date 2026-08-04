@@ -18,7 +18,7 @@ def test_mart_exists_and_has_official_target(level: str):
         pytest.skip(f"Mart not built yet: {path}")
     df = load_school_mart(level)
     assert "target_dropout_rate" in df.columns
-    assert df["target_definition"].iloc[0] == "inep_taxa_abandono_official"
+    assert df["target_definition"].iloc[0] == "inep_official_dropout_rate"
     assert df["education_level"].iloc[0] == level
     assert df["target_dropout_rate"].notna().all()
 

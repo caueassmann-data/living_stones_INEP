@@ -1,4 +1,4 @@
-"""Streamlit app — Ensino Fundamental school abandonment early-warning."""
+"""Streamlit app — Ensino Fundamental school dropout early-warning."""
 
 from __future__ import annotations
 

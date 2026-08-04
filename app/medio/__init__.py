@@ -1,1 +1,1 @@
-# Package marker for Streamlit médio app.
+# Package marker for Streamlit Medio app.

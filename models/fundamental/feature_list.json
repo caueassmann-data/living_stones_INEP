@@ -1,20 +1,39 @@
 {
-  "features": [
-    "tp_dependencia",
-    "tp_localizacao",
+  "numeric_features": [
     "is_rural",
     "is_public",
-    "in_agua",
-    "in_energia",
-    "in_esgoto",
-    "in_internet",
-    "in_biblioteca",
-    "in_lab_info",
-    "in_quadra",
-    "qt_mat_bas",
+    "has_water",
+    "has_electricity",
+    "electricity_absent",
+    "has_sewage",
+    "sewage_absent",
+    "has_internet",
+    "has_internet_for_students",
+    "has_library",
+    "has_computer_lab",
+    "has_sports_court",
+    "enrollment_basic_ed",
     "enrollment_level",
-    "qt_doc_bas",
-    "student_teacher_ratio"
+    "teacher_count_basic_ed",
+    "student_teacher_ratio",
+    "avg_class_size",
+    "overage_enrollment_share",
+    "eja_enrollment_share",
+    "is_covid_year",
+    "dropout_rate_lag1",
+    "dropout_rate_lag2",
+    "dropout_rate_3yr_avg",
+    "dropout_rate_trend",
+    "has_history",
+    "approval_rate_lag1",
+    "failure_rate_lag1",
+    "municipal_dropout_rate_lag1",
+    "state_dropout_rate_lag1"
+  ],
+  "categorical_features": [
+    "admin_dependency_type",
+    "location_type",
+    "state_code"
   ],
   "level": "fundamental"
 }
