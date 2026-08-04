@@ -1,0 +1,22 @@
+{
+  "years": [
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "steps": {
+    "school_risk_br": {
+      "seconds": 199.9,
+      "outputs": {
+        "fundamental": "C:\\Users\\User\\Desktop\\Projeto Living Stone Foundation\\latam_education_data\\marts\\school_risk_br_fundamental\\school_risk_br_fundamental.parquet",
+        "medio": "C:\\Users\\User\\Desktop\\Projeto Living Stone Foundation\\latam_education_data\\marts\\school_risk_br_medio\\school_risk_br_medio.parquet"
+      }
+    }
+  },
+  "total_seconds": 199.9
+}

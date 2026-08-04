@@ -1,0 +1,34 @@
+{
+  "rows_total": 414643,
+  "sources": {
+    "cepal": 227890,
+    "unesco": 164284,
+    "bid": 17005,
+    "world_bank": 3420,
+    "argentina": 1188,
+    "uruguay": 532,
+    "unicef": 324
+  },
+  "countries": 27,
+  "year_min": 1960,
+  "year_max": 2025,
+  "pct_value_missing": 0.007177258509127128,
+  "n_duplicate_key_rows": 0,
+  "n_range_outliers": 2129,
+  "n_temporal_gaps_gt_3y": 11307,
+  "n_cross_source_conflicts": 13,
+  "quality_flag_counts": {
+    "ok": 409538,
+    "missing_source": 2976,
+    "suspect": 2129
+  },
+  "artifacts": [
+    "missingness_by_source.parquet",
+    "duplicate_keys.parquet",
+    "range_outliers.parquet",
+    "coverage_country_year.parquet",
+    "temporal_gaps.parquet",
+    "cross_source_conflicts.parquet",
+    "suspect_conflict_keys.parquet"
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "model_version": "0.2.0",
+  "education_level": "medio",
+  "trained_at_utc": "2026-07-31T03:10:08.924319+00:00",
+  "n_rows": 80000,
+  "n_train": 64000,
+  "n_test": 16000,
+  "selected_model": "random_forest",
+  "cv_leaderboard": [
+    {
+      "model": "random_forest",
+      "cv_mae_mean": 3.251649922583309,
+      "cv_mae_std": 0.020035984047154284
+    },
+    {
+      "model": "xgboost",
+      "cv_mae_mean": 3.2572476109130464,
+      "cv_mae_std": 0.018611053207966275
+    },
+    {
+      "model": "ridge",
+      "cv_mae_mean": 3.3715480503105226,
+      "cv_mae_std": 0.011138725545387945
+    }
+  ],
+  "test_metrics": {
+    "mae": 3.342890522528931,
+    "rmse": 5.864867688273982,
+    "r2": 0.12217686053301069
+  },
+  "target": "target_dropout_rate",
+  "target_definition": "inep_taxa_abandono_official",
+  "seconds": 16.51,
+  "feature_importance_top": [
+    {
+      "feature": "qt_mat_bas",
+      "importance": 0.18551774000192045
+    },
+    {
+      "feature": "student_teacher_ratio",
+      "importance": 0.16636552674107613
+    },
+    {
+      "feature": "enrollment_level",
+      "importance": 0.14867673017537977
+    },
+    {
+      "feature": "tp_dependencia",
+      "importance": 0.1216727020809618
+    },
+    {
+      "feature": "qt_doc_bas",
+      "importance": 0.11309756593566077
+    },
+    {
+      "feature": "is_public",
+      "importance": 0.11180553243313243
+    },
+    {
+      "feature": "in_agua",
+      "importance": 0.04443031474114604
+    },
+    {
+      "feature": "in_internet",
+      "importance": 0.030327968317035055
+    },
+    {
+      "feature": "in_esgoto",
+      "importance": 0.02094083758720267
+    },
+    {
+      "feature": "in_lab_info",
+      "importance": 0.015098396084984365
+    }
+  ]
+}

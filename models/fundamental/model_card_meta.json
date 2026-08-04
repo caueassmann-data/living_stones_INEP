@@ -1,0 +1,6 @@
+{
+  "model_version": "0.2.0",
+  "level": "fundamental",
+  "selected_model": "xgboost",
+  "limitation": "School-level Brazil INEP abandonment model; not student-level scoring."
+}

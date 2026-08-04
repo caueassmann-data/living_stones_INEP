@@ -1,0 +1,33 @@
+{
+  "rows": 225199,
+  "years": [
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "schools": 32612,
+  "education_level": "medio",
+  "target": "target_dropout_rate",
+  "target_definition": "inep_taxa_abandono_official",
+  "target_source_column": "taxa_abandono_med",
+  "join_stats": {
+    "censo_rows": 1453717,
+    "rendimento_rows": 1040730,
+    "inner_join_rows": 1040730,
+    "final_rows_with_target_and_min_enrollment": 225199,
+    "join_match_rate_vs_censo": 0.7159
+  },
+  "risk_rule": {
+    "rank_high_gt": 0.66,
+    "absolute_high_pct": 5.0,
+    "q66": 2.5
+  },
+  "mean_taxa_abandono": 3.3142753742245747,
+  "public_share": 0.7221568479433745,
+  "parquet": "C:\\Users\\User\\Desktop\\Projeto Living Stone Foundation\\latam_education_data\\marts\\school_risk_br_medio\\school_risk_br_medio.parquet"
+}

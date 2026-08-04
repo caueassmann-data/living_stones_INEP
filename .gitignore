@@ -1,0 +1,46 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local secrets / overrides
+.env
+.env.*
+
+# Large or generated local caches
+*.log
+
+# Raw and intermediate data (regenerate via scripts/download_inep_rendimento.py,
+# scripts/stage_inep_rendimento.py, and python -m src.etl.run_etl). These are
+# multi-gigabyte source extracts and build artifacts, not source code.
+latam_education_data/02_national/
+latam_education_data/raw/
+latam_education_data/staging/
+latam_education_data/marts/**/*.parquet
+data/raw/
+data/processed/
+
+# Trained model binaries (regenerate via python -m src.train --level both).
+# Metrics, feature lists, and figures stay tracked — they are small and are
+# the artifacts this repo actually reviews/discusses.
+models/*/pipeline.joblib
+
+# Notebook checkpoints outside .ipynb_checkpoints/ convention
+.ipynb_checkpoints/

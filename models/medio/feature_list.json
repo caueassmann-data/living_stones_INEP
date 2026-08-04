@@ -1,0 +1,20 @@
+{
+  "features": [
+    "tp_dependencia",
+    "tp_localizacao",
+    "is_rural",
+    "is_public",
+    "in_agua",
+    "in_energia",
+    "in_esgoto",
+    "in_internet",
+    "in_biblioteca",
+    "in_lab_info",
+    "in_quadra",
+    "qt_mat_bas",
+    "enrollment_level",
+    "qt_doc_bas",
+    "student_teacher_ratio"
+  ],
+  "level": "medio"
+}

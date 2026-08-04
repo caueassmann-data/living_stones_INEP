@@ -1,0 +1,30 @@
+{
+  "source": "INEP Taxas de Rendimento Escolar (official)",
+  "definition_abandono": "Percentage of students who stopped attending school after the School Census reference date during the school year (movement = left attending). Computed from Censo Escolar Situação do Aluno module.",
+  "grain": "school x year (CO_ENTIDADE / school_id)",
+  "years": [
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "year_min": 2018,
+  "year_max": 2025,
+  "rows": 1040730,
+  "schools": 147330,
+  "coverage": {
+    "fundamental_non_null_pct": 0.925817455055586,
+    "medio_non_null_pct": 0.22405907391926821,
+    "fundamental_mean": 1.203613394968065,
+    "medio_mean": 3.324452258936038
+  },
+  "student_level_labeled_dropout_available": false,
+  "join_key_to_censo": [
+    "school_id=CO_ENTIDADE",
+    "year=NU_ANO_CENSO"
+  ]
+}

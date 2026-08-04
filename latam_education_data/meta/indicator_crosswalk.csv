@@ -1,0 +1,33 @@
+family,canonical_id,canonical_name,source,source_indicator_id,unit_hint,value_type,notes
+dropout,early_school_dropout_18_24,Early school dropout rate ages 18-24,bid,tasa_aban_18_24,rate_0_1,rate,BID household surveys / census
+dropout,early_leavers_18_24,Early leavers share ages 18-24,bid,tasa_aban_18_24_PHC,rate_0_1,rate,BID census early leavers
+oos,oos_primary,Out-of-school rate primary,unicef,ED_ROFST_L1,percent,rate,UNICEF SDMX
+oos,oos_lower_secondary,Out-of-school rate lower secondary,unicef,ED_ROFST_L2,percent,rate,UNICEF SDMX
+oos,oos_upper_secondary,Out-of-school rate upper secondary,unicef,ED_ROFST_L3,percent,rate,UNICEF SDMX
+completion,completion_primary,Primary completion rate,unicef,ED_CR_L1,percent,rate,UNICEF SDMX
+completion,completion_lower_secondary,Lower secondary completion rate,unicef,ED_CR_L2,percent,rate,UNICEF SDMX
+completion,completion_upper_secondary,Upper secondary completion rate,unicef,ED_CR_L3,percent,rate,UNICEF SDMX
+oos,oos_primary,Children out of school primary,world_bank,SE.PRM.UNER,count,count,WB EdStats count not rate
+oos,oos_lower_secondary,Adolescents out of school lower secondary,world_bank,SE.SEC.UNER.LO,count,count,Often sparse in API extract
+oos,oos_upper_secondary,Youth out of school upper secondary,world_bank,SE.SEC.UNER.UP,count,count,Often sparse in API extract
+completion,completion_primary,Primary completion rate,world_bank,SE.PRM.CMPT.ZS,percent,rate,WB EdStats
+completion,completion_lower_secondary,At least completed lower secondary,world_bank,SE.SEC.CUAT.LO.ZS,percent,rate,Attainment proxy
+completion,completion_upper_secondary,At least completed upper secondary,world_bank,SE.SEC.CUAT.UP.ZS,percent,rate,Attainment proxy
+repetition,repeaters_primary,Repeaters primary pct,world_bank,SE.PRM.REPT.ZS,percent,rate,WB EdStats
+progression,progression_to_secondary,Progression to secondary school,world_bank,SE.SEC.PROG.ZS,percent,rate,WB EdStats
+expenditure,gov_edu_pct_gdp,Government expenditure on education pct GDP,world_bank,SE.XPD.TOTL.GD.ZS,percent,rate,WB EdStats
+literacy,adult_literacy,Adult literacy rate,world_bank,SE.ADT.LITR.ZS,percent,rate,WB EdStats
+neet,neet_youth,Youth NEET share,world_bank,SL.UEM.NEET.ZS,percent,rate,WB EdStats
+attendance,school_attendance,School attendance by age quintile area,cepal,143,percent,rate,CEPALSTAT
+attendance,school_attendance_male,Male school attendance,cepal,144,percent,rate,CEPALSTAT
+attendance,school_attendance_female,Female school attendance,cepal,145,percent,rate,CEPALSTAT
+enrollment,net_enrollment,Net enrollment rate by sex and level,cepal,184,percent,rate,CEPALSTAT
+enrollment,adj_net_enrollment_preprimary,Adjusted net enrollment year before primary,cepal,5249,percent,rate,CEPALSTAT
+completion,completion_primary_15_19,Population 15-19 completed primary,cepal,2085,percent,rate,CEPALSTAT
+completion,completion_secondary_20_24,Population 20-24 completed secondary,cepal,2119,percent,rate,CEPALSTAT
+neet,neet_15_24_motive,Population 15-24 neither studying nor employed,cepal,3469,percent,rate,CEPALSTAT
+dropout,dropout_parenting_duties,School dropout due to parenting duties,cepal,5529,percent,rate,CEPALSTAT
+literacy,illiteracy_rate,Illiteracy rate by sex age area,cepal,53,percent,rate,CEPALSTAT
+survival,survive_to_last_primary,Pupils grade1 reaching last primary grade,cepal,1369,percent,rate,CEPALSTAT
+dropout,abandono_intermitente_uy,Intermittent abandonment primary Uruguay,uruguay,abandono_intermitente,percent,rate,Subnational department
+dropout,abandono_interanual_ar,Interannual abandonment rate Argentina,argentina,abandono_interanual,percent,rate,Official efficiency rates
