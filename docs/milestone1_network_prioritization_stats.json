@@ -1,0 +1,468 @@
+{
+  "year": 2025,
+  "example_state": "BA",
+  "decision": {
+    "rule": "top_n_within_network",
+    "default_top_n": 50,
+    "presets": [
+      20,
+      50,
+      100
+    ],
+    "n_owner": "field implementation team",
+    "high_risk_label": "kept in the backend as a historical/evaluation label"
+  },
+  "caveat": "Quality figures here are IN-SAMPLE: the models were trained on a grouped split covering about 80% of schools, so most schools scored below were seen during training. They describe how a list looks on known data, which is the right frame for sizing a rollout, and they OVERSTATE accuracy on new schools. For the unbiased number use models/<level>/metrics.json -> test_ranking_within_network, which is computed on held-out schools only.",
+  "levels": {
+    "fundamental": {
+      "schools_scored": 101530,
+      "scope_size_distribution": {
+        "state": {
+          "n_scopes": 27,
+          "schools_total": 80443,
+          "median_size": 2065.0,
+          "p75_size": 4310.5,
+          "p90_size": 6495.600000000003,
+          "max_size": 10250,
+          "scopes_larger_than_20": 27,
+          "share_scopes_larger_than_20": 1.0,
+          "schools_in_scopes_larger_than_20": 80443,
+          "rollout_list_size_at_20": 540,
+          "scopes_larger_than_50": 27,
+          "share_scopes_larger_than_50": 1.0,
+          "schools_in_scopes_larger_than_50": 80443,
+          "rollout_list_size_at_50": 1350,
+          "scopes_larger_than_100": 27,
+          "share_scopes_larger_than_100": 1.0,
+          "schools_in_scopes_larger_than_100": 80443,
+          "rollout_list_size_at_100": 2700
+        },
+        "state_network": {
+          "n_scopes": 75,
+          "schools_total": 80443,
+          "median_size": 355.0,
+          "p75_size": 1392.5,
+          "p90_size": 3330.0000000000027,
+          "max_size": 7193,
+          "scopes_larger_than_20": 53,
+          "share_scopes_larger_than_20": 0.7067,
+          "schools_in_scopes_larger_than_20": 80393,
+          "rollout_list_size_at_20": 1060,
+          "scopes_larger_than_50": 53,
+          "share_scopes_larger_than_50": 0.7067,
+          "schools_in_scopes_larger_than_50": 80393,
+          "rollout_list_size_at_50": 2650,
+          "scopes_larger_than_100": 52,
+          "share_scopes_larger_than_100": 0.6933,
+          "schools_in_scopes_larger_than_100": 80331,
+          "rollout_list_size_at_100": 5200
+        },
+        "municipality": {
+          "n_scopes": 5571,
+          "schools_total": 80443,
+          "median_size": 7.0,
+          "p75_size": 15.0,
+          "p90_size": 30.0,
+          "max_size": 1572,
+          "scopes_larger_than_20": 939,
+          "share_scopes_larger_than_20": 0.1686,
+          "schools_in_scopes_larger_than_20": 47874,
+          "rollout_list_size_at_20": 18780,
+          "scopes_larger_than_50": 250,
+          "share_scopes_larger_than_50": 0.0449,
+          "schools_in_scopes_larger_than_50": 26667,
+          "rollout_list_size_at_50": 12500,
+          "scopes_larger_than_100": 68,
+          "share_scopes_larger_than_100": 0.0122,
+          "schools_in_scopes_larger_than_100": 14253,
+          "rollout_list_size_at_100": 6800
+        },
+        "network": {
+          "n_scopes": 9392,
+          "schools_total": 80443,
+          "median_size": 3.0,
+          "p75_size": 9.0,
+          "p90_size": 19.0,
+          "max_size": 997,
+          "scopes_larger_than_20": 852,
+          "share_scopes_larger_than_20": 0.0907,
+          "schools_in_scopes_larger_than_20": 40116,
+          "rollout_list_size_at_20": 17040,
+          "scopes_larger_than_50": 208,
+          "share_scopes_larger_than_50": 0.0221,
+          "schools_in_scopes_larger_than_50": 20352,
+          "rollout_list_size_at_50": 10400,
+          "scopes_larger_than_100": 42,
+          "share_scopes_larger_than_100": 0.0045,
+          "schools_in_scopes_larger_than_100": 9263,
+          "rollout_list_size_at_100": 4200
+        }
+      },
+      "topn_quality_state_network": {
+        "by_top_n": {
+          "top_20": {
+            "min_group_size_applied": 40,
+            "n_groups_evaluated": 53,
+            "n_groups_skipped_too_small": 22,
+            "mean_group_size": 1516.8490566037735,
+            "precision_at_n_macro": 0.7254716981132076,
+            "precision_at_n_size_weighted": 0.7993376288980385,
+            "base_rate_macro": 0.3170145355091198,
+            "lift_macro": 2.2884493196758715,
+            "recall_at_n_macro": 0.09684729392224388,
+            "mean_observed_dropout_selected": 4.800943396226415,
+            "mean_observed_dropout_pool": 0.8342254481413712,
+            "share_of_list_already_high_risk": 0.7036,
+            "list_size_nationwide": 1110
+          },
+          "top_50": {
+            "min_group_size_applied": 51,
+            "n_groups_evaluated": 53,
+            "n_groups_skipped_too_small": 22,
+            "mean_group_size": 1516.8490566037735,
+            "precision_at_n_macro": 0.6883018867924527,
+            "precision_at_n_size_weighted": 0.7866662520368689,
+            "base_rate_macro": 0.3170145355091198,
+            "lift_macro": 2.1711997706573674,
+            "recall_at_n_macro": 0.2160171322567122,
+            "mean_observed_dropout_selected": 3.5090943396226413,
+            "mean_observed_dropout_pool": 0.8342254481413712,
+            "share_of_list_already_high_risk": 0.68,
+            "list_size_nationwide": 2700
+          },
+          "top_100": {
+            "min_group_size_applied": 101,
+            "n_groups_evaluated": 52,
+            "n_groups_skipped_too_small": 23,
+            "mean_group_size": 1544.826923076923,
+            "precision_at_n_macro": 0.6363461538461538,
+            "precision_at_n_size_weighted": 0.7491108040482504,
+            "base_rate_macro": 0.3147362790579925,
+            "lift_macro": 2.0218392228272557,
+            "recall_at_n_macro": 0.3496506130731526,
+            "mean_observed_dropout_selected": 2.6833461538461543,
+            "mean_observed_dropout_pool": 0.8357831335584821,
+            "share_of_list_already_high_risk": 0.6303,
+            "list_size_nationwide": 5312
+          }
+        },
+        "n_groups_total": 75
+      },
+      "topn_quality_municipal_network": {
+        "by_top_n": {
+          "top_20": {
+            "min_group_size_applied": 40,
+            "n_groups_evaluated": 322,
+            "n_groups_skipped_too_small": 9070,
+            "mean_group_size": 78.73913043478261,
+            "precision_at_n_macro": 0.5690993788819876,
+            "precision_at_n_size_weighted": 0.6107241460913465,
+            "base_rate_macro": 0.39003345356666963,
+            "lift_macro": 1.4591040170473728,
+            "recall_at_n_macro": 0.5105597455863139,
+            "mean_observed_dropout_selected": 1.7762267080745344,
+            "mean_observed_dropout_pool": 0.8960941916539154,
+            "share_of_list_already_high_risk": 0.3013,
+            "list_size_nationwide": 57367
+          },
+          "top_50": {
+            "min_group_size_applied": 51,
+            "n_groups_evaluated": 208,
+            "n_groups_skipped_too_small": 9184,
+            "mean_group_size": 97.84615384615384,
+            "precision_at_n_macro": 0.47846153846153844,
+            "precision_at_n_size_weighted": 0.5336841588050315,
+            "base_rate_macro": 0.3934839657138969,
+            "lift_macro": 1.215961970886074,
+            "recall_at_n_macro": 0.8047880140748533,
+            "mean_observed_dropout_selected": 1.1926923076923077,
+            "mean_observed_dropout_pool": 0.858305482707028,
+            "share_of_list_already_high_risk": 0.3012,
+            "list_size_nationwide": 70491
+          },
+          "top_100": {
+            "min_group_size_applied": 101,
+            "n_groups_evaluated": 42,
+            "n_groups_skipped_too_small": 9350,
+            "mean_group_size": 220.54761904761904,
+            "precision_at_n_macro": 0.520952380952381,
+            "precision_at_n_size_weighted": 0.5580999676130842,
+            "base_rate_macro": 0.42012767097249804,
+            "lift_macro": 1.2399858827353532,
+            "recall_at_n_macro": 0.7756903063980645,
+            "mean_observed_dropout_selected": 1.1600714285714284,
+            "mean_observed_dropout_pool": 0.8394114524099985,
+            "share_of_list_already_high_risk": 0.3011,
+            "list_size_nationwide": 75380
+          }
+        },
+        "n_groups_total": 9392
+      },
+      "tie_break_stability": {
+        "scope": "state_network",
+        "top_n": 50,
+        "list_size": 2700,
+        "schools_differing_after_row_shuffle": 0,
+        "identical": true
+      },
+      "year_over_year_persistence": {
+        "scope": "state_network",
+        "top_n": 50,
+        "available": true,
+        "years": [
+          2024,
+          2025
+        ],
+        "list_size": 2700,
+        "carried_over": 1573,
+        "share_carried_over": 0.5826
+      },
+      "worked_example": {
+        "state_code": "BA",
+        "top_n": 50,
+        "state_municipal_network": {
+          "pool_size": 7193,
+          "selected": 50,
+          "mean_observed_dropout_selected": 9.128,
+          "mean_observed_dropout_pool": 0.96,
+          "share_of_list_already_high_risk": 1.0,
+          "schools_currently_high_risk_in_pool": 2778
+        },
+        "largest_municipal_network": {
+          "municipality_name": "Salvador",
+          "municipality_id": 2927408,
+          "pool_size": 315,
+          "selected": 50,
+          "fully_covered": false,
+          "mean_observed_dropout_selected": 0.008,
+          "mean_observed_dropout_pool": 0.054
+        }
+      }
+    },
+    "medio": {
+      "schools_scored": 28917,
+      "scope_size_distribution": {
+        "state": {
+          "n_scopes": 27,
+          "schools_total": 20845,
+          "median_size": 517.0,
+          "p75_size": 830.0,
+          "p90_size": 1351.200000000001,
+          "max_size": 3967,
+          "scopes_larger_than_20": 27,
+          "share_scopes_larger_than_20": 1.0,
+          "schools_in_scopes_larger_than_20": 20845,
+          "rollout_list_size_at_20": 540,
+          "scopes_larger_than_50": 27,
+          "share_scopes_larger_than_50": 1.0,
+          "schools_in_scopes_larger_than_50": 20845,
+          "rollout_list_size_at_50": 1350,
+          "scopes_larger_than_100": 27,
+          "share_scopes_larger_than_100": 1.0,
+          "schools_in_scopes_larger_than_100": 20845,
+          "rollout_list_size_at_100": 2700
+        },
+        "state_network": {
+          "n_scopes": 66,
+          "schools_total": 20845,
+          "median_size": 38.0,
+          "p75_size": 323.25,
+          "p90_size": 779.0,
+          "max_size": 3883,
+          "scopes_larger_than_20": 43,
+          "share_scopes_larger_than_20": 0.6515,
+          "schools_in_scopes_larger_than_20": 20607,
+          "rollout_list_size_at_20": 860,
+          "scopes_larger_than_50": 28,
+          "share_scopes_larger_than_50": 0.4242,
+          "schools_in_scopes_larger_than_50": 20122,
+          "rollout_list_size_at_50": 1400,
+          "scopes_larger_than_100": 26,
+          "share_scopes_larger_than_100": 0.3939,
+          "schools_in_scopes_larger_than_100": 19954,
+          "rollout_list_size_at_100": 2600
+        },
+        "municipality": {
+          "n_scopes": 5561,
+          "schools_total": 20845,
+          "median_size": 2.0,
+          "p75_size": 3.0,
+          "p90_size": 7.0,
+          "max_size": 641,
+          "scopes_larger_than_20": 125,
+          "share_scopes_larger_than_20": 0.0225,
+          "schools_in_scopes_larger_than_20": 6199,
+          "rollout_list_size_at_20": 2500,
+          "scopes_larger_than_50": 30,
+          "share_scopes_larger_than_50": 0.0054,
+          "schools_in_scopes_larger_than_50": 3319,
+          "rollout_list_size_at_50": 1500,
+          "scopes_larger_than_100": 12,
+          "share_scopes_larger_than_100": 0.0022,
+          "schools_in_scopes_larger_than_100": 2112,
+          "rollout_list_size_at_100": 1200
+        },
+        "network": {
+          "n_scopes": 6176,
+          "schools_total": 20845,
+          "median_size": 1.0,
+          "p75_size": 3.0,
+          "p90_size": 6.0,
+          "max_size": 629,
+          "scopes_larger_than_20": 117,
+          "share_scopes_larger_than_20": 0.0189,
+          "schools_in_scopes_larger_than_20": 5839,
+          "rollout_list_size_at_20": 2340,
+          "scopes_larger_than_50": 27,
+          "share_scopes_larger_than_50": 0.0044,
+          "schools_in_scopes_larger_than_50": 3074,
+          "rollout_list_size_at_50": 1350,
+          "scopes_larger_than_100": 8,
+          "share_scopes_larger_than_100": 0.0013,
+          "schools_in_scopes_larger_than_100": 1655,
+          "rollout_list_size_at_100": 800
+        }
+      },
+      "topn_quality_state_network": {
+        "by_top_n": {
+          "top_20": {
+            "min_group_size_applied": 40,
+            "n_groups_evaluated": 32,
+            "n_groups_skipped_too_small": 34,
+            "mean_group_size": 634.46875,
+            "precision_at_n_macro": 0.6328125,
+            "precision_at_n_size_weighted": 0.7370881150568882,
+            "base_rate_macro": 0.30391790880683145,
+            "lift_macro": 2.0821823316842187,
+            "recall_at_n_macro": 0.26510768082596603,
+            "mean_observed_dropout_selected": 8.19984375,
+            "mean_observed_dropout_pool": 2.7005259324411037,
+            "share_of_list_already_high_risk": 0.4627,
+            "list_size_nationwide": 1098
+          },
+          "top_50": {
+            "min_group_size_applied": 51,
+            "n_groups_evaluated": 28,
+            "n_groups_skipped_too_small": 38,
+            "mean_group_size": 718.6428571428571,
+            "precision_at_n_macro": 0.6064285714285714,
+            "precision_at_n_size_weighted": 0.6870996918795349,
+            "base_rate_macro": 0.31870532484001235,
+            "lift_macro": 1.90278769811265,
+            "recall_at_n_macro": 0.3406648435515294,
+            "mean_observed_dropout_selected": 6.610214285714286,
+            "mean_observed_dropout_pool": 2.6420274924938947,
+            "share_of_list_already_high_risk": 0.4677,
+            "list_size_nationwide": 2123
+          },
+          "top_100": {
+            "min_group_size_applied": 101,
+            "n_groups_evaluated": 26,
+            "n_groups_skipped_too_small": 40,
+            "mean_group_size": 767.4615384615385,
+            "precision_at_n_macro": 0.573076923076923,
+            "precision_at_n_size_weighted": 0.6572150947178511,
+            "base_rate_macro": 0.32217453279449726,
+            "lift_macro": 1.778777850955919,
+            "recall_at_n_macro": 0.49016596750609753,
+            "mean_observed_dropout_selected": 5.518346153846154,
+            "mean_observed_dropout_pool": 2.642883767633538,
+            "share_of_list_already_high_risk": 0.483,
+            "list_size_nationwide": 3491
+          }
+        },
+        "n_groups_total": 66
+      },
+      "topn_quality_municipal_network": {
+        "by_top_n": {
+          "top_20": {
+            "min_group_size_applied": 40,
+            "n_groups_evaluated": 43,
+            "n_groups_skipped_too_small": 6133,
+            "mean_group_size": 88.09302325581395,
+            "precision_at_n_macro": 0.5965116279069768,
+            "precision_at_n_size_weighted": 0.664625131995776,
+            "base_rate_macro": 0.3739076181168908,
+            "lift_macro": 1.595344943521572,
+            "recall_at_n_macro": 0.5303191916912787,
+            "mean_observed_dropout_selected": 5.253488372093023,
+            "mean_observed_dropout_pool": 2.8720341048372733,
+            "share_of_list_already_high_risk": 0.3397,
+            "list_size_nationwide": 17346
+          },
+          "top_50": {
+            "min_group_size_applied": 51,
+            "n_groups_evaluated": 27,
+            "n_groups_skipped_too_small": 6149,
+            "mean_group_size": 113.85185185185185,
+            "precision_at_n_macro": 0.5051851851851852,
+            "precision_at_n_size_weighted": 0.6032270657124269,
+            "base_rate_macro": 0.3699842882798869,
+            "lift_macro": 1.3654233468503967,
+            "recall_at_n_macro": 0.8126124648627033,
+            "mean_observed_dropout_selected": 4.352518518518519,
+            "mean_observed_dropout_pool": 2.944424146051802,
+            "share_of_list_already_high_risk": 0.3371,
+            "list_size_nationwide": 19121
+          },
+          "top_100": {
+            "min_group_size_applied": 101,
+            "n_groups_evaluated": 8,
+            "n_groups_skipped_too_small": 6168,
+            "mean_group_size": 206.875,
+            "precision_at_n_macro": 0.49375,
+            "precision_at_n_size_weighted": 0.6438247734138972,
+            "base_rate_macro": 0.37336803995170764,
+            "lift_macro": 1.3224217050389822,
+            "recall_at_n_macro": 0.8090598563455589,
+            "mean_observed_dropout_selected": 4.665749999999999,
+            "mean_observed_dropout_pool": 3.1141388344752112,
+            "share_of_list_already_high_risk": 0.3326,
+            "list_size_nationwide": 19990
+          }
+        },
+        "n_groups_total": 6176
+      },
+      "tie_break_stability": {
+        "scope": "state_network",
+        "top_n": 50,
+        "list_size": 2123,
+        "schools_differing_after_row_shuffle": 0,
+        "identical": true
+      },
+      "year_over_year_persistence": {
+        "scope": "state_network",
+        "top_n": 50,
+        "available": true,
+        "years": [
+          2024,
+          2025
+        ],
+        "list_size": 2123,
+        "carried_over": 1505,
+        "share_carried_over": 0.7089
+      },
+      "worked_example": {
+        "state_code": "BA",
+        "top_n": 50,
+        "state_municipal_network": {
+          "pool_size": 11,
+          "selected": 11,
+          "mean_observed_dropout_selected": 5.027,
+          "mean_observed_dropout_pool": 5.027,
+          "share_of_list_already_high_risk": 0.7273,
+          "schools_currently_high_risk_in_pool": 8
+        },
+        "largest_municipal_network": {
+          "municipality_name": "Xique-Xique",
+          "municipality_id": 2933604,
+          "pool_size": 5,
+          "selected": 5,
+          "fully_covered": true,
+          "mean_observed_dropout_selected": 3.78,
+          "mean_observed_dropout_pool": 3.78
+        }
+      }
+    }
+  }
+}

@@ -269,5 +269,82 @@
       "feature": "dropout_rate_lag2",
       "importance": 0.017206677124302846
     }
-  ]
+  ],
+  "test_ranking_within_network": {
+    "state_network": {
+      "by_top_n": {
+        "top_20": {
+          "min_group_size_applied": 40,
+          "n_groups_evaluated": 254,
+          "n_groups_skipped_too_small": 450,
+          "mean_group_size": 158.9724409448819,
+          "precision_at_n_macro": 0.4899606299212598,
+          "precision_at_n_size_weighted": 0.5535587805542486,
+          "base_rate_macro": 0.3304265042891221,
+          "lift_macro": 1.4828127391758679,
+          "recall_at_n_macro": 0.42297301435706103,
+          "mean_observed_dropout_selected": 6.132224409448819,
+          "mean_observed_dropout_pool": 3.4338081897244206
+        },
+        "top_50": {
+          "min_group_size_applied": 51,
+          "n_groups_evaluated": 223,
+          "n_groups_skipped_too_small": 481,
+          "mean_group_size": 174.71748878923768,
+          "precision_at_n_macro": 0.43533632286995516,
+          "precision_at_n_size_weighted": 0.5090518967198809,
+          "base_rate_macro": 0.3323473788884735,
+          "lift_macro": 1.30988342476455,
+          "recall_at_n_macro": 0.6439044248229733,
+          "mean_observed_dropout_selected": 4.99352466367713,
+          "mean_observed_dropout_pool": 3.4452187011234896
+        }
+      },
+      "n_groups_total": 704
+    },
+    "municipal_network": {
+      "by_top_n": {
+        "top_20": {
+          "min_group_size_applied": 40,
+          "n_groups_evaluated": 32,
+          "n_groups_skipped_too_small": 22601,
+          "mean_group_size": 101.375,
+          "precision_at_n_macro": 0.4140625,
+          "precision_at_n_size_weighted": 0.36515104808877935,
+          "base_rate_macro": 0.29941583441040553,
+          "lift_macro": 1.3829011442075227,
+          "recall_at_n_macro": 0.4918933498949292,
+          "mean_observed_dropout_selected": 4.86171875,
+          "mean_observed_dropout_pool": 3.1349283765917306
+        },
+        "top_50": {
+          "min_group_size_applied": 51,
+          "n_groups_evaluated": 24,
+          "n_groups_skipped_too_small": 22609,
+          "mean_group_size": 120.375,
+          "precision_at_n_macro": 0.255,
+          "precision_at_n_size_weighted": 0.27574939425406714,
+          "base_rate_macro": 0.1844062977323926,
+          "lift_macro": 1.38281611385123,
+          "recall_at_n_macro": 0.697330529692319,
+          "mean_observed_dropout_selected": 2.247666666666667,
+          "mean_observed_dropout_pool": 1.5353443169371221
+        }
+      },
+      "n_groups_total": 22633
+    }
+  },
+  "prioritization_policy": {
+    "rule": "top_n_within_network",
+    "default_scope": "state_network",
+    "default_top_n": 50,
+    "presets": [
+      20,
+      50,
+      100
+    ],
+    "prioritization_version": "1.0.0",
+    "backend_label_unchanged": "high_risk (assign_risk_bands) is evaluation-only",
+    "backfilled_without_retraining": true
+  }
 }

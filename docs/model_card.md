@@ -7,6 +7,22 @@ predicted dropout rates and inspect the school features contributing to that
 prediction, so limited follow-up resources can be pointed at the schools that
 need them most.
 
+### Deployed decision rule
+
+The rule the product applies is **capacity-constrained Top-N within one
+education network** (`src/prioritize.py`), decided by the Foundation in
+Milestone 1: pick a network, rank its schools by predicted dropout rate, take
+the top N, where N is how many schools the field team can follow up on
+(default 50). It is deliberately **not** a threshold on the dropout rate: a
+fixed cut such as ">= 5%" is strict in Ensino Fundamental (mean 0.5%) and
+common in Ensino Medio, so it cannot be one product rule.
+
+The mart's `high_risk` label is **not** the decision rule. It is a historical /
+evaluation label only (`assign_risk_bands` in
+`src/etl/build_school_risk_marts.py`), used for the ranking metrics below and
+not shown to end users. In 2025 it flags 26% of Fundamental schools, which is
+not an actionable list — see `docs/milestone1_high_risk_criteria.md`.
+
 ## Out of scope
 
 - Individual student risk scores (no student-level labeled data exists in the
@@ -17,6 +33,9 @@ need them most.
   see `docs/scope_revision.md`).
 - Punitive use (ranking schools to withhold resources or assign blame). See
   "Equity notes" below.
+- League tables. A prioritized list is an ordering of where to look first
+  inside one network; it is not a comparison between networks, and positions
+  are not comparable across scopes or across N.
 
 ## Training data
 
@@ -64,9 +83,25 @@ The winner is written to `models/{level}/metrics.json` (`selected_model`).
   points), on both held-out views above.
 - Ranking (triage quality): precision@k, recall@k, lift, and average
   precision against the mart's `high_risk` label (`test_ranking_metrics` in
-  `metrics.json`) — see `src/evaluate.py::evaluate_ranking`. This answers the
-  question the product actually needs: "if we act on the top decile of
-  predicted risk, how many of the truly highest-risk schools do we catch."
+  `metrics.json`) — see `src/evaluate.py::evaluate_ranking`. One national
+  ranking: "if we act on the top decile of predicted risk nationwide, how many
+  of the truly highest-risk schools do we catch."
+- Ranking **within a network** (`test_ranking_within_network` in
+  `metrics.json`) — see `src/evaluate.py::evaluate_ranking_within_group`. This
+  is the metric that matches the deployed rule, and it is the one to quote
+  operationally. On held-out schools, top 50 inside a state network:
+
+  | Level | Networks | Precision@50 | Base rate | Lift | Observed dropout in list |
+  |---|---:|---:|---:|---:|---:|
+  | Fundamental | 523 | 0.50 | 0.35 | 1.45 | 2.50% |
+  | Medio | 223 | 0.44 | 0.33 | 1.31 | 4.99% |
+
+  **Read these with their qualifier.** They cover only networks with more than
+  N schools — 94% of Brazilian municipalities have fewer than 50 schools, and
+  in those the "top 50" is the whole network, so no lift figure describes them.
+  Within-network lift is also structurally lower than the national figure
+  (2.18 at the top decile) because schools inside one network are more alike;
+  that is expected, not a regression.
 
 ## Explainability
 
@@ -88,6 +123,14 @@ category (e.g. `state_code_SP`).
   reported where available — see `docs/validity_and_english_revision.md`.
 - Prefer supportive triage (resource targeting) over ranking schools for
   punishment or public comparison.
+- **Top-N interacts with network size.** In a small network a school can enter
+  the list simply because few schools compete with it, not because its risk is
+  high; in a near-zero-dropout network the ordering is largely noise (Salvador's
+  municipal Fundamental network averages 0.05% observed dropout, and its top 50
+  has *lower* observed dropout than the network average). The app warns in both
+  cases — see `coverage_message` and `low_signal_message` in
+  `src/prioritize.py` — but a list always returns N rows, so the warnings are
+  the only thing standing between a small network and a misread.
 - Always display the limitation statement (`src/utils.py::LIMITATION_STATEMENT`)
   in app footers — every app in this repo already does this.
 

@@ -37,10 +37,17 @@ latam_education_data/marts/**/*.parquet
 data/raw/
 data/processed/
 
-# Trained model binaries (regenerate via python -m src.train --level both).
-# Metrics, feature lists, and figures stay tracked — they are small and are
-# the artifacts this repo actually reviews/discusses.
-models/*/pipeline.joblib
+# Trained model binaries. These WERE ignored as regenerable build output, and
+# are now tracked because the hosted Streamlit app deploys from a plain
+# `git clone` and cannot run without them (~41 MB, under GitHub's 100 MB
+# per-file limit, so no LFS). Note that each retrain adds a new copy to git
+# history; if that becomes a problem, move them to Git LFS rather than
+# re-ignoring them, which would break the deployment.
+# models/*/pipeline.joblib
+
+# The slim deploy marts (latam_education_data/marts_app/) are tracked for the
+# same reason — built by scripts/build_deploy_artifacts.py. The full marts
+# above stay ignored: they are gigabytes of ETL output.
 
 # Notebook checkpoints outside .ipynb_checkpoints/ convention
 .ipynb_checkpoints/

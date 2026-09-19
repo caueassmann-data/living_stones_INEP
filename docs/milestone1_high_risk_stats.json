@@ -1,0 +1,775 @@
+{
+  "current_rule": {
+    "high_if": "rank_percentile > 0.66 OR observed dropout_rate >= 5.0",
+    "floor_tie": "minimum observed rate (usually 0%) is forced to low / not high_risk",
+    "bands": "low <=0.33, moderate 0.33-0.66, high >0.66, with >=5% override to high",
+    "applies_within": "education level (Fundamental and Medio separately), all years pooled",
+    "source": "src/etl/build_school_risk_marts.py::assign_risk_bands"
+  },
+  "levels": {
+    "fundamental": {
+      "profile": {
+        "level": "fundamental",
+        "rows": 832326,
+        "schools": 122211,
+        "high_risk_rows": 289313,
+        "high_risk_share": 0.3476,
+        "schools_ever_high_risk": 83562,
+        "risk_band": {
+          "low": 538016,
+          "high": 289313,
+          "moderate": 4997
+        },
+        "q66_all_years": 0.2,
+        "mean_dropout": 1.142,
+        "share_zero_dropout": 0.6464,
+        "by_year": [
+          {
+            "year": 2018,
+            "rows": 107996,
+            "schools": 107996,
+            "high_risk_rows": 49747,
+            "high_risk_share": 0.4606,
+            "mean_dropout": 1.623,
+            "p66_dropout": 0.9,
+            "share_ge_5": 0.0995,
+            "share_ge_10": 0.0306,
+            "share_zero": 0.5339
+          },
+          {
+            "year": 2019,
+            "rows": 106411,
+            "schools": 106411,
+            "high_risk_rows": 44660,
+            "high_risk_share": 0.4197,
+            "mean_dropout": 1.308,
+            "p66_dropout": 0.6,
+            "share_ge_5": 0.0734,
+            "share_ge_10": 0.022,
+            "share_zero": 0.5743
+          },
+          {
+            "year": 2020,
+            "rows": 104136,
+            "schools": 104136,
+            "high_risk_rows": 30921,
+            "high_risk_share": 0.2969,
+            "mean_dropout": 1.625,
+            "p66_dropout": 0.0,
+            "share_ge_5": 0.0888,
+            "share_ge_10": 0.0458,
+            "share_zero": 0.6962
+          },
+          {
+            "year": 2021,
+            "rows": 103899,
+            "schools": 103899,
+            "high_risk_rows": 35849,
+            "high_risk_share": 0.345,
+            "mean_dropout": 1.314,
+            "p66_dropout": 0.2,
+            "share_ge_5": 0.0799,
+            "share_ge_10": 0.0313,
+            "share_zero": 0.6495
+          },
+          {
+            "year": 2022,
+            "rows": 103674,
+            "schools": 103674,
+            "high_risk_rows": 38960,
+            "high_risk_share": 0.3758,
+            "mean_dropout": 1.212,
+            "p66_dropout": 0.4,
+            "share_ge_5": 0.0702,
+            "share_ge_10": 0.0231,
+            "share_zero": 0.6189
+          },
+          {
+            "year": 2023,
+            "rows": 102583,
+            "schools": 102583,
+            "high_risk_rows": 32050,
+            "high_risk_share": 0.3124,
+            "mean_dropout": 0.795,
+            "p66_dropout": 0.0,
+            "share_ge_5": 0.0384,
+            "share_ge_10": 0.0116,
+            "share_zero": 0.6808
+          },
+          {
+            "year": 2024,
+            "rows": 102097,
+            "schools": 102097,
+            "high_risk_rows": 30516,
+            "high_risk_share": 0.2989,
+            "mean_dropout": 0.674,
+            "p66_dropout": 0.0,
+            "share_ge_5": 0.0305,
+            "share_ge_10": 0.0084,
+            "share_zero": 0.6949
+          },
+          {
+            "year": 2025,
+            "rows": 101530,
+            "schools": 101530,
+            "high_risk_rows": 26610,
+            "high_risk_share": 0.2621,
+            "mean_dropout": 0.53,
+            "p66_dropout": 0.0,
+            "share_ge_5": 0.0212,
+            "share_ge_10": 0.0055,
+            "share_zero": 0.7319
+          }
+        ],
+        "latest_year": 2025,
+        "latest_schools": 101530,
+        "latest_high_risk": 26610,
+        "latest_high_risk_share": 0.2621,
+        "latest_by_state_top10": [
+          {
+            "state_code": "SP",
+            "schools": 14572,
+            "high_risk": 4993,
+            "mean_dropout": 0.485,
+            "high_risk_share": 0.343
+          },
+          {
+            "state_code": "BA",
+            "schools": 9319,
+            "high_risk": 3215,
+            "mean_dropout": 0.857,
+            "high_risk_share": 0.345
+          },
+          {
+            "state_code": "MG",
+            "schools": 8881,
+            "high_risk": 2467,
+            "mean_dropout": 0.427,
+            "high_risk_share": 0.278
+          },
+          {
+            "state_code": "PA",
+            "schools": 6604,
+            "high_risk": 2197,
+            "mean_dropout": 1.044,
+            "high_risk_share": 0.333
+          },
+          {
+            "state_code": "RJ",
+            "schools": 6861,
+            "high_risk": 1810,
+            "mean_dropout": 0.383,
+            "high_risk_share": 0.264
+          },
+          {
+            "state_code": "MA",
+            "schools": 6000,
+            "high_risk": 1762,
+            "mean_dropout": 0.704,
+            "high_risk_share": 0.294
+          },
+          {
+            "state_code": "RS",
+            "schools": 5028,
+            "high_risk": 1481,
+            "mean_dropout": 0.349,
+            "high_risk_share": 0.295
+          },
+          {
+            "state_code": "AM",
+            "schools": 3220,
+            "high_risk": 1298,
+            "mean_dropout": 1.702,
+            "high_risk_share": 0.403
+          },
+          {
+            "state_code": "PE",
+            "schools": 5226,
+            "high_risk": 891,
+            "mean_dropout": 0.23,
+            "high_risk_share": 0.17
+          },
+          {
+            "state_code": "RN",
+            "schools": 2059,
+            "high_risk": 735,
+            "mean_dropout": 0.822,
+            "high_risk_share": 0.357
+          }
+        ],
+        "example_states_latest": {
+          "BA": {
+            "schools": 9319,
+            "high_risk": 3215,
+            "high_risk_share": 0.345
+          },
+          "PE": {
+            "schools": 5226,
+            "high_risk": 891,
+            "high_risk_share": 0.1705
+          },
+          "SP": {
+            "schools": 14572,
+            "high_risk": 4993,
+            "high_risk_share": 0.3426
+          },
+          "AM": {
+            "schools": 3220,
+            "high_risk": 1298,
+            "high_risk_share": 0.4031
+          }
+        }
+      },
+      "candidates": {
+        "sizes": {
+          "current_high_risk_label": {
+            "n": 26610,
+            "share": 0.2621
+          },
+          "observed_ge_5pct": {
+            "n": 2155,
+            "share": 0.0212
+          },
+          "observed_ge_10pct": {
+            "n": 562,
+            "share": 0.0055
+          },
+          "observed_top10pct_national": {
+            "n": 10191,
+            "share": 0.1004
+          },
+          "observed_top5pct_national": {
+            "n": 5270,
+            "share": 0.0519
+          },
+          "observed_top10pct_within_state": {
+            "n": 17220,
+            "share": 0.1696
+          },
+          "observed_top50_national": {
+            "n": 51,
+            "share": 0.0005
+          },
+          "observed_top50_per_state": {
+            "n": 1393,
+            "share": 0.0137
+          },
+          "pred_ge_5pct": {
+            "n": 670,
+            "share": 0.0066
+          },
+          "pred_top10pct_national": {
+            "n": 10153,
+            "share": 0.1
+          },
+          "pred_top5pct_national": {
+            "n": 5076,
+            "share": 0.05
+          },
+          "pred_top10pct_within_state": {
+            "n": 10152,
+            "share": 0.1
+          },
+          "pred_top50_national": {
+            "n": 50,
+            "share": 0.0005
+          },
+          "pred_top50_per_state": {
+            "n": 1350,
+            "share": 0.0133,
+            "approx_list_size_if_full_states": 1350
+          },
+          "pred_top20_per_state": {
+            "n": 540,
+            "share": 0.0053,
+            "approx_list_size_if_full_states": 540
+          },
+          "n_schools_latest": 101530,
+          "n_states": 27
+        },
+        "comparisons": {
+          "current_vs_pred_top10pct_national": {
+            "n_a": 26610,
+            "n_b": 10153,
+            "intersection": 7835,
+            "jaccard": 0.2708,
+            "share_of_a_in_b": 0.2944,
+            "share_of_b_in_a": 0.7717
+          },
+          "current_vs_pred_top50_per_state": {
+            "n_a": 26610,
+            "n_b": 1350,
+            "intersection": 1022,
+            "jaccard": 0.0379,
+            "share_of_a_in_b": 0.0384,
+            "share_of_b_in_a": 0.757
+          },
+          "current_vs_observed_ge_5pct": {
+            "n_a": 26610,
+            "n_b": 2155,
+            "intersection": 2155,
+            "jaccard": 0.081,
+            "share_of_a_in_b": 0.081,
+            "share_of_b_in_a": 1.0
+          },
+          "pred_top50_national_vs_observed_top50_national": {
+            "n_a": 50,
+            "n_b": 51,
+            "intersection": 12,
+            "jaccard": 0.1348,
+            "share_of_a_in_b": 0.24,
+            "share_of_b_in_a": 0.2353
+          },
+          "pred_top10pct_national_vs_observed_top10pct_national": {
+            "n_a": 10153,
+            "n_b": 10191,
+            "intersection": 5818,
+            "jaccard": 0.4005,
+            "share_of_a_in_b": 0.573,
+            "share_of_b_in_a": 0.5709
+          },
+          "pred_top50_per_state_vs_observed_top50_per_state": {
+            "n_a": 1350,
+            "n_b": 1393,
+            "intersection": 489,
+            "jaccard": 0.2169,
+            "share_of_a_in_b": 0.3622,
+            "share_of_b_in_a": 0.351
+          },
+          "pred_ge_5pct_vs_observed_ge_5pct": {
+            "n_a": 670,
+            "n_b": 2155,
+            "intersection": 435,
+            "jaccard": 0.182,
+            "share_of_a_in_b": 0.6493,
+            "share_of_b_in_a": 0.2019
+          }
+        },
+        "example_states": {
+          "BA": {
+            "schools": 9319,
+            "current_high_risk": 3215,
+            "observed_ge_5": 376,
+            "pred_ge_5": 88,
+            "pred_top50_mean_pred": 6.76,
+            "pred_top50_mean_observed": 9.88,
+            "pred_top50_vs_observed_top50_overlap": 18,
+            "current_high_risk_in_pred_top50": 50
+          },
+          "PE": {
+            "schools": 5226,
+            "current_high_risk": 891,
+            "observed_ge_5": 29,
+            "pred_ge_5": 1,
+            "pred_top50_mean_pred": 2.59,
+            "pred_top50_mean_observed": 2.53,
+            "pred_top50_vs_observed_top50_overlap": 15,
+            "current_high_risk_in_pred_top50": 36
+          },
+          "SP": {
+            "schools": 14572,
+            "current_high_risk": 4993,
+            "observed_ge_5": 140,
+            "pred_ge_5": 1,
+            "pred_top50_mean_pred": 3.62,
+            "pred_top50_mean_observed": 5.83,
+            "pred_top50_vs_observed_top50_overlap": 14,
+            "current_high_risk_in_pred_top50": 49
+          },
+          "AM": {
+            "schools": 3220,
+            "current_high_risk": 1298,
+            "observed_ge_5": 344,
+            "pred_ge_5": 197,
+            "pred_top50_mean_pred": 10.67,
+            "pred_top50_mean_observed": 12.43,
+            "pred_top50_vs_observed_top50_overlap": 17,
+            "current_high_risk_in_pred_top50": 41
+          }
+        }
+      }
+    },
+    "medio": {
+      "profile": {
+        "level": "medio",
+        "rows": 225199,
+        "schools": 32612,
+        "high_risk_rows": 76346,
+        "high_risk_share": 0.339,
+        "schools_ever_high_risk": 19949,
+        "risk_band": {
+          "low": 103836,
+          "high": 76346,
+          "moderate": 45017
+        },
+        "q66_all_years": 2.5,
+        "mean_dropout": 3.314,
+        "share_zero_dropout": 0.4611,
+        "by_year": [
+          {
+            "year": 2018,
+            "rows": 27715,
+            "schools": 27715,
+            "high_risk_rows": 13066,
+            "high_risk_share": 0.4714,
+            "mean_dropout": 4.894,
+            "p66_dropout": 5.4,
+            "share_ge_5": 0.3571,
+            "share_ge_10": 0.1833,
+            "share_zero": 0.3678
+          },
+          {
+            "year": 2019,
+            "rows": 27740,
+            "schools": 27740,
+            "high_risk_rows": 11118,
+            "high_risk_share": 0.4008,
+            "mean_dropout": 3.765,
+            "p66_dropout": 3.6,
+            "share_ge_5": 0.2725,
+            "share_ge_10": 0.1209,
+            "share_zero": 0.4016
+          },
+          {
+            "year": 2020,
+            "rows": 27695,
+            "schools": 27695,
+            "high_risk_rows": 5772,
+            "high_risk_share": 0.2084,
+            "mean_dropout": 2.31,
+            "p66_dropout": 0.6,
+            "share_ge_5": 0.1401,
+            "share_ge_10": 0.0663,
+            "share_zero": 0.5768
+          },
+          {
+            "year": 2021,
+            "rows": 27860,
+            "schools": 27860,
+            "high_risk_rows": 9237,
+            "high_risk_share": 0.3316,
+            "mean_dropout": 3.811,
+            "p66_dropout": 2.4,
+            "share_ge_5": 0.2395,
+            "share_ge_10": 0.1291,
+            "share_zero": 0.4767
+          },
+          {
+            "year": 2022,
+            "rows": 28147,
+            "schools": 28147,
+            "high_risk_rows": 11818,
+            "high_risk_share": 0.4199,
+            "mean_dropout": 4.572,
+            "p66_dropout": 4.3,
+            "share_ge_5": 0.3116,
+            "share_ge_10": 0.1652,
+            "share_zero": 0.4042
+          },
+          {
+            "year": 2023,
+            "rows": 28443,
+            "schools": 28443,
+            "high_risk_rows": 9059,
+            "high_risk_share": 0.3185,
+            "mean_dropout": 2.757,
+            "p66_dropout": 2.2,
+            "share_ge_5": 0.2008,
+            "share_ge_10": 0.0745,
+            "share_zero": 0.4788
+          },
+          {
+            "year": 2024,
+            "rows": 28682,
+            "schools": 28682,
+            "high_risk_rows": 9087,
+            "high_risk_share": 0.3168,
+            "mean_dropout": 2.606,
+            "p66_dropout": 2.2,
+            "share_ge_5": 0.186,
+            "share_ge_10": 0.0623,
+            "share_zero": 0.4629
+          },
+          {
+            "year": 2025,
+            "rows": 28917,
+            "schools": 28917,
+            "high_risk_rows": 7189,
+            "high_risk_share": 0.2486,
+            "mean_dropout": 1.878,
+            "p66_dropout": 1.4,
+            "share_ge_5": 0.1236,
+            "share_ge_10": 0.0331,
+            "share_zero": 0.518
+          }
+        ],
+        "latest_year": 2025,
+        "latest_schools": 28917,
+        "latest_high_risk": 7189,
+        "latest_high_risk_share": 0.2486,
+        "latest_by_state_top10": [
+          {
+            "state_code": "SP",
+            "schools": 6364,
+            "high_risk": 2005,
+            "mean_dropout": 2.192,
+            "high_risk_share": 0.315
+          },
+          {
+            "state_code": "MG",
+            "schools": 3354,
+            "high_risk": 1020,
+            "mean_dropout": 1.966,
+            "high_risk_share": 0.304
+          },
+          {
+            "state_code": "RJ",
+            "schools": 2172,
+            "high_risk": 614,
+            "mean_dropout": 2.419,
+            "high_risk_share": 0.283
+          },
+          {
+            "state_code": "BA",
+            "schools": 1580,
+            "high_risk": 523,
+            "mean_dropout": 2.36,
+            "high_risk_share": 0.331
+          },
+          {
+            "state_code": "RS",
+            "schools": 1510,
+            "high_risk": 440,
+            "mean_dropout": 2.262,
+            "high_risk_share": 0.291
+          },
+          {
+            "state_code": "SC",
+            "schools": 1027,
+            "high_risk": 432,
+            "mean_dropout": 2.6,
+            "high_risk_share": 0.421
+          },
+          {
+            "state_code": "MA",
+            "schools": 1020,
+            "high_risk": 388,
+            "mean_dropout": 3.603,
+            "high_risk_share": 0.38
+          },
+          {
+            "state_code": "PB",
+            "schools": 668,
+            "high_risk": 228,
+            "mean_dropout": 2.74,
+            "high_risk_share": 0.341
+          },
+          {
+            "state_code": "AM",
+            "schools": 492,
+            "high_risk": 213,
+            "mean_dropout": 4.052,
+            "high_risk_share": 0.433
+          },
+          {
+            "state_code": "RN",
+            "schools": 476,
+            "high_risk": 167,
+            "mean_dropout": 2.514,
+            "high_risk_share": 0.351
+          }
+        ],
+        "example_states_latest": {
+          "BA": {
+            "schools": 1580,
+            "high_risk": 523,
+            "high_risk_share": 0.331
+          },
+          "PE": {
+            "schools": 1093,
+            "high_risk": 81,
+            "high_risk_share": 0.0741
+          },
+          "SP": {
+            "schools": 6364,
+            "high_risk": 2005,
+            "high_risk_share": 0.3151
+          },
+          "AM": {
+            "schools": 492,
+            "high_risk": 213,
+            "high_risk_share": 0.4329
+          }
+        }
+      },
+      "candidates": {
+        "sizes": {
+          "current_high_risk_label": {
+            "n": 7189,
+            "share": 0.2486
+          },
+          "observed_ge_5pct": {
+            "n": 3575,
+            "share": 0.1236
+          },
+          "observed_ge_10pct": {
+            "n": 958,
+            "share": 0.0331
+          },
+          "observed_top10pct_national": {
+            "n": 2944,
+            "share": 0.1018
+          },
+          "observed_top5pct_national": {
+            "n": 1467,
+            "share": 0.0507
+          },
+          "observed_top10pct_within_state": {
+            "n": 3506,
+            "share": 0.1212
+          },
+          "observed_top50_national": {
+            "n": 50,
+            "share": 0.0017
+          },
+          "observed_top50_per_state": {
+            "n": 1968,
+            "share": 0.0681
+          },
+          "pred_ge_5pct": {
+            "n": 2713,
+            "share": 0.0938
+          },
+          "pred_top10pct_national": {
+            "n": 2892,
+            "share": 0.1
+          },
+          "pred_top5pct_national": {
+            "n": 1446,
+            "share": 0.05
+          },
+          "pred_top10pct_within_state": {
+            "n": 2891,
+            "share": 0.1
+          },
+          "pred_top50_national": {
+            "n": 50,
+            "share": 0.0017
+          },
+          "pred_top50_per_state": {
+            "n": 1350,
+            "share": 0.0467,
+            "approx_list_size_if_full_states": 1350
+          },
+          "pred_top20_per_state": {
+            "n": 540,
+            "share": 0.0187,
+            "approx_list_size_if_full_states": 540
+          },
+          "n_schools_latest": 28917,
+          "n_states": 27
+        },
+        "comparisons": {
+          "current_vs_pred_top10pct_national": {
+            "n_a": 7189,
+            "n_b": 2892,
+            "intersection": 2318,
+            "jaccard": 0.2986,
+            "share_of_a_in_b": 0.3224,
+            "share_of_b_in_a": 0.8015
+          },
+          "current_vs_pred_top50_per_state": {
+            "n_a": 7189,
+            "n_b": 1350,
+            "intersection": 861,
+            "jaccard": 0.1121,
+            "share_of_a_in_b": 0.1198,
+            "share_of_b_in_a": 0.6378
+          },
+          "current_vs_observed_ge_5pct": {
+            "n_a": 7189,
+            "n_b": 3575,
+            "intersection": 3575,
+            "jaccard": 0.4973,
+            "share_of_a_in_b": 0.4973,
+            "share_of_b_in_a": 1.0
+          },
+          "pred_top50_national_vs_observed_top50_national": {
+            "n_a": 50,
+            "n_b": 50,
+            "intersection": 12,
+            "jaccard": 0.1364,
+            "share_of_a_in_b": 0.24,
+            "share_of_b_in_a": 0.24
+          },
+          "pred_top10pct_national_vs_observed_top10pct_national": {
+            "n_a": 2892,
+            "n_b": 2944,
+            "intersection": 1583,
+            "jaccard": 0.3722,
+            "share_of_a_in_b": 0.5474,
+            "share_of_b_in_a": 0.5377
+          },
+          "pred_top50_per_state_vs_observed_top50_per_state": {
+            "n_a": 1350,
+            "n_b": 1968,
+            "intersection": 609,
+            "jaccard": 0.2248,
+            "share_of_a_in_b": 0.4511,
+            "share_of_b_in_a": 0.3095
+          },
+          "pred_ge_5pct_vs_observed_ge_5pct": {
+            "n_a": 2713,
+            "n_b": 3575,
+            "intersection": 1677,
+            "jaccard": 0.3637,
+            "share_of_a_in_b": 0.6181,
+            "share_of_b_in_a": 0.4691
+          }
+        },
+        "example_states": {
+          "BA": {
+            "schools": 1580,
+            "current_high_risk": 523,
+            "observed_ge_5": 206,
+            "pred_ge_5": 165,
+            "pred_top50_mean_pred": 7.85,
+            "pred_top50_mean_observed": 9.6,
+            "pred_top50_vs_observed_top50_overlap": 18,
+            "current_high_risk_in_pred_top50": 40
+          },
+          "PE": {
+            "schools": 1093,
+            "current_high_risk": 81,
+            "observed_ge_5": 31,
+            "pred_ge_5": 19,
+            "pred_top50_mean_pred": 5.04,
+            "pred_top50_mean_observed": 4.18,
+            "pred_top50_vs_observed_top50_overlap": 22,
+            "current_high_risk_in_pred_top50": 26
+          },
+          "SP": {
+            "schools": 6364,
+            "current_high_risk": 2005,
+            "observed_ge_5": 1092,
+            "pred_ge_5": 763,
+            "pred_top50_mean_pred": 8.08,
+            "pred_top50_mean_observed": 10.93,
+            "pred_top50_vs_observed_top50_overlap": 9,
+            "current_high_risk_in_pred_top50": 50
+          },
+          "AM": {
+            "schools": 492,
+            "current_high_risk": 213,
+            "observed_ge_5": 158,
+            "pred_ge_5": 128,
+            "pred_top50_mean_pred": 8.73,
+            "pred_top50_mean_observed": 13.05,
+            "pred_top50_vs_observed_top50_overlap": 25,
+            "current_high_risk_in_pred_top50": 45
+          }
+        }
+      }
+    }
+  }
+}

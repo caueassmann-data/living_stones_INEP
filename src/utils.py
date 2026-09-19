@@ -24,6 +24,10 @@ from typing import Any
 PROJECT_ROOT = Path(__file__).parent.parent
 DATA_ROOT = PROJECT_ROOT / "latam_education_data"
 MARTS_ROOT = DATA_ROOT / "marts"
+# Slim, committed copies of the marts holding only the most recent years, so a
+# deployed app can run from a plain `git clone`. The full marts are gigabytes
+# of build output and stay out of version control — see build_deploy_artifacts.
+APP_MARTS_ROOT = DATA_ROOT / "marts_app"
 MODELS_DIR = PROJECT_ROOT / "models"
 FIGURES_DIR = MODELS_DIR / "figures"
 
@@ -114,8 +118,36 @@ FEATURE_COLUMNS = NUMERIC_FEATURE_COLUMNS + CATEGORICAL_FEATURE_COLUMNS
 
 
 def mart_path(level: str) -> Path:
+    """The full mart: every year, built locally by the ETL. Never committed.
+
+    Training and evaluation must always use this one — never the slim deploy
+    copy below, which would silently train on a two-year window.
+    """
     name = f"school_risk_br_{level}"
     return MARTS_ROOT / name / f"{name}.parquet"
+
+
+def app_mart_path(level: str) -> Path:
+    """The slim, committed mart used when the full one is not on disk."""
+    return APP_MARTS_ROOT / f"school_risk_br_{level}_recent.parquet"
+
+
+def resolve_app_mart_path(level: str) -> Path:
+    """Mart for the Streamlit app: the full one locally, the slim one deployed.
+
+    The app derives its year picker from whatever it loads, so it adapts to
+    either without a code change. Only read-only app code may call this; see
+    mart_path() for why training must not.
+    """
+    full = mart_path(level)
+    try:
+        if full.exists():
+            return full
+    except OSError:
+        # Path.exists() has been observed to hang or raise under OneDrive sync
+        # locks on this project's Desktop checkout (see the note above).
+        pass
+    return app_mart_path(level)
 
 
 def model_dir(level: str) -> Path:

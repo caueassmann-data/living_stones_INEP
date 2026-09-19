@@ -86,8 +86,91 @@ python -m streamlit run app/main.py
 
 # Or run any view standalone:
 python -m streamlit run app/model_results/main.py   # model metrics, drivers, state (UF) risk
-python -m streamlit run app/fundamental/main.py      # school triage — Fundamental
-python -m streamlit run app/medio/main.py            # school triage — Medio
+python -m streamlit run app/fundamental/main.py      # school prioritization — Fundamental
+python -m streamlit run app/medio/main.py            # school prioritization — Medio
+```
+
+#### Prioritized school list (the main output)
+
+The first tab builds the list a field team actually works from: pick a **scope**
+(state network / municipality / municipal network / a set of municipalities),
+an **administrative network**, and **N** — how many schools the team can follow
+up on (default 50) — and export the ranked list as CSV.
+
+The rule lives in [`src/prioritize.py`](src/prioritize.py) and can be called
+directly:
+
+```python
+from src.prioritize import prioritize
+
+result = prioritize(
+    "fundamental",
+    year=2025,
+    scope="state_network",        # "network" for one municipality's own schools
+    state_codes=["BA"],
+    admin_dependency_types=[3],   # Municipal
+    top_n=50,
+)
+result.frame.to_csv(result.filename("fundamental"), index=False)
+```
+
+Two things the API makes explicit, because a Top-N list always returns N rows
+and hides them otherwise: `coverage_message()` fires when the scope has fewer
+schools than N (the median municipal network has 3), and `low_signal_message()`
+fires when even the top of the list is predicted below the model's own margin
+of error. Background: [`docs/milestone1_high_risk_criteria.md`](docs/milestone1_high_risk_criteria.md).
+
+The mart's `high_risk` label is unchanged, and is an evaluation label only — it
+is not what the list is built from and is not shown to end users.
+
+### Deploying the app (Streamlit Community Cloud)
+
+The app needs two things the repository does not normally carry: the marts
+(gigabytes of ETL output) and `models/*/pipeline.joblib`. Community Cloud
+deploys from a plain `git clone`, so both have to be committed — and the full
+marts are far too large (~620 MB once loaded into pandas). The fix is a slim
+two-year copy of each mart:
+
+```bash
+python scripts/build_deploy_artifacts.py
+git add latam_education_data/marts_app models/*/pipeline.joblib
+git commit -m "Refresh deploy artifacts"
+git push
+```
+
+That writes `latam_education_data/marts_app/` — 10.6 MB on disk, ~154 MB in
+memory, against 49.7 MB / ~620 MB for the full marts. Measured end to end, the
+app uses **680 MB** of RSS with both levels loaded and scored, down from
+1.25 GB. Total repository payload is ~51 MB, under GitHub's 100 MB per-file
+limit, so no Git LFS is needed.
+
+Then on [share.streamlit.io](https://share.streamlit.io): **New app** → this
+repository → branch → main file `app/main.py`.
+
+Details worth knowing:
+
+- `src/utils.py::resolve_app_mart_path` loads the **full** mart when it exists
+  (local development, all years 2018-2025) and the slim one otherwise (the
+  deployment). The year picker is derived from whatever loads, so no code
+  changes between the two. Training deliberately does **not** use this
+  fallback — it always reads the full mart, so it can never fit on a two-year
+  window by accident.
+- `requirements.txt` is the app runtime only. ETL, training, test, and
+  notebook dependencies are in `requirements-dev.txt` (which installs both),
+  so the hosted build does not pull DuckDB, Jupyter, or XGBoost.
+- `scripts/build_deploy_artifacts.py` fails loudly if a retrain selected a
+  model whose library is not in `requirements.txt` (today: XGBoost), rather
+  than letting the hosted app break on unpickling.
+- Re-run the script after every retrain or ETL rebuild, then commit. Each
+  retrain adds a new ~41 MB blob to git history; if that becomes a problem,
+  move the binaries to Git LFS rather than re-ignoring them.
+
+### Analysis scripts
+
+```bash
+python scripts/analyze_high_risk_criteria.py        # Milestone 1 tasks 1-5: threshold options
+python scripts/analyze_network_prioritization.py    # Milestone 1 tasks 6-7: network sizes, Top-N quality
+python scripts/backfill_within_network_metrics.py   # add within-network metrics without retraining
 ```
 
 Export static PNGs for Slack / reports (also under `models/*/figures/`):

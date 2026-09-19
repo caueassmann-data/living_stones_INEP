@@ -1,15 +1,18 @@
 """Evaluation and explainability for the Brazil school-level dropout-rate models.
 
-Four kinds of metrics are computed, because they answer different questions:
+Five kinds of metrics are computed, because they answer different questions:
 
   1. `evaluate_on_test` — regression error (MAE/RMSE/R2). Answers "how far
      off is a single prediction, in percentage points of dropout rate."
   2. `evaluate_ranking` — precision@k, recall@k, lift, and average precision
-     against the mart's `high_risk` label. Answers the question the product
-     actually needs: "if we sort schools by predicted risk and act on the
-     top decile, how many of the truly highest-risk schools do we catch."
-     A model can have a mediocre MAE and still be a genuinely useful triage
-     tool if its ranking is good — this is why both are reported.
+     against the mart's `high_risk` label, over one national ranking. A model
+     can have a mediocre MAE and still be a genuinely useful triage tool if
+     its ranking is good — this is why both are reported.
+  2b. `evaluate_ranking_within_group` — the same idea, but inside each
+     network, which is how the tool is actually used: a team picks its own
+     network and takes the top N schools in it (src/prioritize.py). Within a
+     network the schools are more alike, so this number is lower than (2) and
+     is the one to quote operationally.
   3. `evaluate_by_subgroup` — error broken out by rural/urban, public/private,
      and enrollment size. A model with a good *average* error can still be
      systematically worse for one of these groups; the model card
@@ -97,6 +100,122 @@ def evaluate_ranking(
         else float("nan"),
         "by_k": by_k,
     }
+
+
+def evaluate_ranking_within_group(
+    y_pred: np.ndarray,
+    positive_true: np.ndarray,
+    groups: pd.Series | np.ndarray,
+    *,
+    top_ns: tuple[int, ...] = (20, 50),
+    min_group_size: int = 40,
+    observed_rate: np.ndarray | None = None,
+) -> dict[str, Any]:
+    """Ranking quality *inside* each network, which is how the product is used.
+
+    `evaluate_ranking` above measures one national ranking. The deployed rule
+    is different: a field team picks a network and takes the top N schools in
+    it (see src/prioritize.py). Those are not the same question — within a
+    network the schools are more alike, so the achievable lift is lower, and
+    reporting only the national number overstates what a team will see.
+
+    `positive_true` is the label counted as a hit, normally the mart's
+    `high_risk`. It is named generically because the Foundation may later want
+    it pointed at a different definition without a rewrite.
+
+    Groups smaller than `min_group_size` are skipped, and the floor is raised
+    to `top_n + 1` regardless of what the caller passes: in a group of exactly
+    N schools, the "top N" IS the group, so precision@N equals the base rate
+    and lift is 1.0 by construction. Averaging those in would manufacture a
+    "no signal" result out of arithmetic. `n_groups_skipped_too_small` is
+    reported so the number is never read as national coverage.
+
+    `precision_at_n_macro` is the headline: the decision is taken once per
+    network, so each network counts once regardless of size.
+    `precision_at_n_size_weighted` weights each network by how many schools it
+    contains; a gap between the two means the rule works better in large
+    networks than in small ones, which matters because network size varies by
+    three orders of magnitude. (A row-weighted "micro" average would be
+    identical to the macro one here — every eligible network contributes
+    exactly N selected rows — so it is not reported.)
+    """
+    y_pred = np.asarray(y_pred, dtype=float)
+    positive_true = np.asarray(positive_true, dtype=int)
+    frame = pd.DataFrame(
+        {
+            "pred": y_pred,
+            "positive": positive_true,
+            "group": pd.Series(groups).astype("string").fillna("(missing)").to_numpy(),
+        }
+    )
+    if observed_rate is not None:
+        frame["observed"] = np.asarray(observed_rate, dtype=float)
+
+    out: dict[str, Any] = {"by_top_n": {}}
+    for top_n in top_ns:
+        floor = max(int(min_group_size), int(top_n) + 1)
+        sizes = frame.groupby("group")["pred"].transform("size")
+        eligible = frame.loc[sizes >= floor]
+        n_skipped = int(frame["group"].nunique() - eligible["group"].nunique())
+
+        if eligible.empty:
+            out["by_top_n"][f"top_{top_n}"] = {
+                "min_group_size_applied": floor,
+                "n_groups_evaluated": 0,
+                "n_groups_skipped_too_small": n_skipped,
+            }
+            continue
+
+        per_group: list[dict[str, float]] = []
+        for _, g in eligible.groupby("group", sort=False):
+            # Ties broken by position, mirroring the stable sort in
+            # src/prioritize.py so the metric measures the shipped rule.
+            selected = g.nlargest(top_n, "pred", keep="first")
+            row = {
+                "precision": float(selected["positive"].mean()),
+                "base_rate": float(g["positive"].mean()),
+                "recall": float(selected["positive"].sum() / g["positive"].sum())
+                if g["positive"].sum()
+                else float("nan"),
+                "n_selected": int(len(selected)),
+                "n_positive_selected": int(selected["positive"].sum()),
+                "size": int(len(g)),
+            }
+            if observed_rate is not None:
+                row["observed_selected"] = float(selected["observed"].mean())
+                row["observed_pool"] = float(g["observed"].mean())
+            per_group.append(row)
+
+        table = pd.DataFrame(per_group)
+        precision_macro = float(table["precision"].mean())
+        base_macro = float(table["base_rate"].mean())
+        total_schools = int(table["size"].sum())
+        stats: dict[str, Any] = {
+            "min_group_size_applied": floor,
+            "n_groups_evaluated": int(len(table)),
+            "n_groups_skipped_too_small": n_skipped,
+            "mean_group_size": float(table["size"].mean()),
+            "precision_at_n_macro": precision_macro,
+            "precision_at_n_size_weighted": float(
+                (table["precision"] * table["size"]).sum() / total_schools
+            )
+            if total_schools
+            else float("nan"),
+            "base_rate_macro": base_macro,
+            "lift_macro": precision_macro / base_macro if base_macro else float("nan"),
+            "recall_at_n_macro": float(table["recall"].mean(skipna=True)),
+        }
+        if observed_rate is not None:
+            # The honest headline for a non-technical stakeholder: in
+            # Fundamental, `high_risk` largely means "dropout is not exactly
+            # zero" (about 65% of rows are 0%), so precision alone flatters the
+            # result. The observed dropout of the selected schools does not.
+            stats["mean_observed_dropout_selected"] = float(table["observed_selected"].mean())
+            stats["mean_observed_dropout_pool"] = float(table["observed_pool"].mean())
+        out["by_top_n"][f"top_{top_n}"] = stats
+
+    out["n_groups_total"] = int(frame["group"].nunique())
+    return out
 
 
 def evaluate_by_subgroup(

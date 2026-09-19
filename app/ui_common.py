@@ -12,7 +12,20 @@ import pandas as pd
 import streamlit as st
 
 from src.inference import load_artifacts, predict_frame, score_single
-from src.utils import LIMITATION_STATEMENT, mart_path
+from src.prioritize import (
+    ADMIN_DEPENDENCY_LABELS,
+    DEFAULT_SCOPE,
+    DEFAULT_TOP_N,
+    MAX_TOP_N,
+    MIN_TOP_N,
+    PUBLIC_ADMIN_DEPENDENCY_TYPES,
+    SCOPE_DISPLAY_NAME,
+    TOP_N_PRESETS,
+    coverage_message,
+    low_signal_message,
+    prioritize,
+)
+from src.utils import LIMITATION_STATEMENT, resolve_app_mart_path
 
 ADMIN_DEPENDENCY_OPTIONS = {"Federal": 1, "State": 2, "Municipal": 3, "Private": 4}
 LOCATION_OPTIONS = {"Urban": 1, "Rural": 2}
@@ -74,11 +87,30 @@ def _cached_predict(level: str, df: pd.DataFrame) -> pd.DataFrame:
 
 @st.cache_data(show_spinner="Loading training mart...")
 def _cached_mart(level: str) -> pd.DataFrame | None:
-    path = mart_path(level)
+    # Full mart when it exists (local development, every year available),
+    # otherwise the slim committed copy a deployment ships with.
+    path = resolve_app_mart_path(level)
     try:
         return pd.read_parquet(path)
     except FileNotFoundError:
         return None
+
+
+@st.cache_data(show_spinner="Scoring every school for this year...")
+def _cached_scored_year(level: str, year: int) -> pd.DataFrame:
+    """Score one whole year once, then filter the already-scored frame.
+
+    Keyed on (level, year) rather than on a DataFrame: @st.cache_data hashes
+    its arguments, and hashing a 100k-row frame on every widget interaction is
+    what made the old code cap the input at 20,000 rows before ranking — which
+    silently meant a "top 50" was the top 50 of whatever happened to come first
+    in mart order. Scoring the full year once is both correct and faster.
+    """
+    mart = _cached_mart(level)
+    if mart is None:
+        return pd.DataFrame()
+    slice_ = mart.loc[pd.to_numeric(mart["year"], errors="coerce") == int(year)].copy()
+    return predict_frame(level, slice_)
 
 
 def _uncertainty_caption(art: dict) -> str:
@@ -90,6 +122,225 @@ def _uncertainty_caption(art: dict) -> str:
         f"Typical error on held-out schools is about **+/-{mae:.1f} percentage points** "
         "(hold-out MAE). Treat this as a risk *ranking* signal, not a precise forecast."
     )
+
+
+def _render_prioritization_tab(level: str, art: dict) -> None:
+    """Top-N prioritization inside one education network.
+
+    This is the tool's main output for a field team. The rule itself lives in
+    src/prioritize.py; everything here is selection widgets and rendering, so
+    the rule can be tested (tests/test_prioritize.py) without Streamlit.
+
+    Note the wording throughout: the user picks how many schools their team can
+    follow up on, and gets that many. The mart's `high_risk` label is not shown
+    here — the Foundation kept it as a historical/evaluation label, reported in
+    the model-results app instead.
+    """
+    st.subheader("Prioritized school list (Top-N within a network)")
+    st.caption(
+        "A prioritization of where to look first, not a verdict on a school. "
+        "Set N to the number of schools your team can realistically follow up on."
+    )
+
+    mart_df = _cached_mart(level)
+    if mart_df is None:
+        st.warning(f"Training mart not found for {level}.")
+        return
+
+    years_available = sorted(mart_df["year"].dropna().astype(int).unique().tolist())
+
+    row1 = st.columns([1, 2, 2])
+    with row1[0]:
+        year_filter = st.selectbox(
+            "Year", years_available, index=len(years_available) - 1, key=f"{level}_pri_year"
+        )
+    with row1[1]:
+        scope = st.selectbox(
+            "Prioritize within",
+            list(SCOPE_DISPLAY_NAME.keys()),
+            index=list(SCOPE_DISPLAY_NAME.keys()).index(DEFAULT_SCOPE),
+            format_func=lambda s: SCOPE_DISPLAY_NAME[s],
+            key=f"{level}_pri_scope",
+            help=(
+                "The pool a school competes inside. A municipal network is often very "
+                "small (the median one has a handful of schools), so the default is one "
+                "administrative network within one state."
+            ),
+        )
+    with row1[2]:
+        # Derived from the mart, not hard-coded, so a level with no Federal
+        # schools does not offer an empty filter.
+        available_types = sorted(
+            pd.to_numeric(mart_df["admin_dependency_type"], errors="coerce")
+            .dropna()
+            .astype(int)
+            .unique()
+            .tolist()
+        )
+        default_types = [t for t in available_types if t in PUBLIC_ADMIN_DEPENDENCY_TYPES]
+        admin_types = st.multiselect(
+            "Administrative network",
+            available_types,
+            default=default_types,
+            format_func=lambda t: ADMIN_DEPENDENCY_LABELS.get(t, str(t)),
+            key=f"{level}_pri_admin",
+        )
+
+    year_slice = mart_df.loc[pd.to_numeric(mart_df["year"], errors="coerce") == int(year_filter)]
+
+    row2 = st.columns([1, 3])
+    with row2[0]:
+        state_options = sorted(year_slice["state_code"].dropna().unique().tolist())
+        state_filter = st.selectbox(
+            "State (UF)", ["All Brazil"] + state_options, key=f"{level}_pri_state"
+        )
+    with row2[1]:
+        if state_filter == "All Brazil":
+            municipality_ids: list = []
+            st.multiselect(
+                "Municipality",
+                [],
+                disabled=True,
+                key=f"{level}_pri_mun_disabled",
+                help="Pick a state first to choose municipalities.",
+            )
+        else:
+            in_state = year_slice.loc[year_slice["state_code"] == state_filter]
+            options = (
+                in_state[["municipality_id", "municipality_name"]]
+                .drop_duplicates()
+                .sort_values("municipality_name")
+            )
+            labels = {
+                int(r.municipality_id): f"{r.municipality_name}"
+                for r in options.itertuples(index=False)
+            }
+            municipality_ids = st.multiselect(
+                "Municipality (leave empty for the whole state)",
+                list(labels.keys()),
+                format_func=lambda m: labels.get(m, str(m)),
+                key=f"{level}_pri_mun",
+            )
+
+    row3 = st.columns([2, 2])
+    with row3[0]:
+        n_choice = st.radio(
+            "How many schools can your team follow up on?",
+            [*TOP_N_PRESETS, "Custom"],
+            index=TOP_N_PRESETS.index(DEFAULT_TOP_N),
+            horizontal=True,
+            key=f"{level}_pri_n_choice",
+        )
+        top_n = (
+            st.number_input(
+                "Custom N",
+                min_value=MIN_TOP_N,
+                max_value=MAX_TOP_N,
+                value=DEFAULT_TOP_N,
+                step=5,
+                key=f"{level}_pri_n_custom",
+            )
+            if n_choice == "Custom"
+            else int(n_choice)
+        )
+    with row3[1]:
+        require_history = st.checkbox(
+            "Only schools with at least one year of dropout history",
+            value=False,
+            key=f"{level}_pri_history",
+            help=(
+                "A school with no track record is predicted almost entirely from Census "
+                "features. That matters more under Top-N than under a threshold, because "
+                "such a school can land at the very top of a short list."
+            ),
+        )
+
+    scored_year = _cached_scored_year(level, int(year_filter))
+    if scored_year.empty:
+        st.warning(f"No rows for {year_filter} in the {level} mart.")
+        return
+
+    result = prioritize(
+        level,
+        df=scored_year,
+        year=int(year_filter),
+        scope=scope,
+        top_n=int(top_n),
+        state_codes=[state_filter] if state_filter != "All Brazil" else None,
+        municipality_ids=municipality_ids or None,
+        admin_dependency_types=admin_types or None,
+        require_history=require_history,
+    )
+
+    if result.pool_size == 0:
+        st.warning("No schools match this selection. Try widening the filters.")
+        return
+
+    cols = st.columns(4)
+    cols[0].metric("Schools in scope", f"{result.pool_size:,}")
+    cols[1].metric("Networks covered", f"{result.meta['n_scopes']:,}")
+    cols[2].metric("Schools prioritized", f"{result.n_selected:,}")
+    pool_mean = float(result.scope_summary["mean_pred_pool"].mean())
+    sel_mean = float(result.frame["pred_dropout_rate"].mean())
+    cols[3].metric(
+        "Mean predicted dropout in list",
+        f"{sel_mean:.2f}%",
+        delta=f"{sel_mean - pool_mean:+.2f} pp vs pool",
+    )
+
+    message = coverage_message(result)
+    if message:
+        st.info(message)
+    weak = low_signal_message(result)
+    if weak:
+        st.warning(weak)
+
+    st.caption(_uncertainty_caption(art))
+    st.dataframe(result.frame, width="stretch", hide_index=True)
+    st.download_button(
+        f"Download this prioritized list ({result.n_selected} schools, CSV)",
+        result.to_csv_bytes(),
+        file_name=result.filename(level),
+        mime="text/csv",
+    )
+
+    with st.expander("Per-network detail (pool size vs schools selected)"):
+        st.dataframe(result.scope_summary, width="stretch", hide_index=True)
+
+    with st.expander("Look up a specific school (does not change the list above)"):
+        # Deliberately separate from the filters: the old version searched by
+        # name BEFORE ranking, which quietly redefined what "Top 50" meant.
+        query = st.text_input("School or municipality name", key=f"{level}_pri_lookup")
+        if query:
+            q = query.strip().lower()
+            pool = scored_year
+            if state_filter != "All Brazil":
+                pool = pool.loc[pool["state_code"] == state_filter]
+            name_cols = [c for c in ("school_name", "municipality_name") if c in pool.columns]
+            mask = pd.Series(False, index=pool.index)
+            for c in name_cols:
+                mask = mask | pool[c].astype(str).str.lower().str.contains(q, na=False)
+            hits = pool.loc[mask]
+            show_cols = [
+                c
+                for c in [
+                    "school_id",
+                    "school_name",
+                    "municipality_name",
+                    "state_code",
+                    "pred_dropout_rate",
+                    "target_dropout_rate",
+                    "dropout_rate_lag1",
+                    "enrollment_level",
+                ]
+                if c in hits.columns
+            ]
+            st.caption(f"{len(hits):,} matching schools in {year_filter}.")
+            st.dataframe(
+                hits[show_cols].sort_values("pred_dropout_rate", ascending=False).head(200),
+                width="stretch",
+                hide_index=True,
+            )
 
 
 def run_app(level: str, title: str) -> None:
@@ -111,11 +362,19 @@ def run_app(level: str, title: str) -> None:
         st.stop()
 
     tabs = st.tabs(
-        ["School triage (batch)", "Find a school", "Single school profiler", "Model insights"]
+        [
+            "Prioritized school list",
+            "Batch scoring (CSV)",
+            "Single school profiler",
+            "Model insights",
+        ]
     )
 
     with tabs[0]:
-        st.subheader("Batch school triage")
+        _render_prioritization_tab(level, art)
+
+    with tabs[1]:
+        st.subheader("Batch scoring")
         st.write(
             "Upload a CSV with school feature columns (same schema as the training mart). "
             "The model predicts the official-style dropout rate (%)."
@@ -132,7 +391,9 @@ def run_app(level: str, title: str) -> None:
                         "year",
                         "school_id",
                         "school_name",
+                        "municipality_name",
                         "state_code",
+                        "admin_dependency_label",
                         "target_dropout_rate",
                         "pred_dropout_rate",
                         "enrollment_level",
@@ -157,61 +418,6 @@ def run_app(level: str, title: str) -> None:
                 file_name=f"scored_{level}.csv",
                 mime="text/csv",
             )
-
-    with tabs[1]:
-        st.subheader("Find a school and prioritize by predicted risk")
-        mart_df = _cached_mart(level)
-        if mart_df is None:
-            st.warning(f"Training mart not found for {level}.")
-        else:
-            years_available = sorted(mart_df["year"].dropna().astype(int).unique().tolist())
-            col1, col2, col3 = st.columns([2, 1, 1])
-            with col1:
-                query = st.text_input("Search by school or municipality name (optional)")
-            with col2:
-                state_filter = st.selectbox(
-                    "State (UF)", ["All"] + sorted(mart_df["state_code"].dropna().unique().tolist())
-                )
-            with col3:
-                year_filter = st.selectbox("Year", years_available, index=len(years_available) - 1)
-
-            filtered = mart_df.loc[mart_df["year"] == year_filter].copy()
-            if state_filter != "All":
-                filtered = filtered.loc[filtered["state_code"] == state_filter]
-            if query:
-                q = query.strip().lower()
-                name_cols = [c for c in ("school_name", "municipality_name") if c in filtered.columns]
-                mask = pd.Series(False, index=filtered.index)
-                for c in name_cols:
-                    mask = mask | filtered[c].astype(str).str.lower().str.contains(q, na=False)
-                filtered = filtered.loc[mask]
-
-            st.caption(f"{len(filtered):,} schools match this filter (year {year_filter}).")
-            if len(filtered) > 0:
-                scored = _cached_predict(level, filtered.head(20000))
-                top_n = st.slider("How many top-risk schools to show / export", 10, 500, 50, step=10)
-                ranked = scored.sort_values("pred_dropout_rate", ascending=False).head(top_n)
-                show_cols = [
-                    c
-                    for c in [
-                        "school_id",
-                        "school_name",
-                        "municipality_name",
-                        "state_code",
-                        "pred_dropout_rate",
-                        "target_dropout_rate",
-                        "dropout_rate_lag1",
-                        "enrollment_level",
-                    ]
-                    if c in ranked.columns
-                ]
-                st.dataframe(ranked[show_cols])
-                st.download_button(
-                    f"Download top {top_n} highest-risk schools (CSV)",
-                    ranked[show_cols].to_csv(index=False).encode("utf-8"),
-                    file_name=f"top_{top_n}_priority_schools_{level}_{year_filter}.csv",
-                    mime="text/csv",
-                )
 
     with tabs[2]:
         st.subheader("Single school profiler")
@@ -328,7 +534,21 @@ def run_app(level: str, title: str) -> None:
         ranking = art["metrics"].get("test_ranking_metrics")
         if ranking:
             st.write("**Triage ranking quality** (top-decile lift over random selection)")
+            st.caption(
+                "Measured against the mart's `high_risk` label, which the Foundation kept as a "
+                "historical/evaluation label. It is not the product rule and is not shown to "
+                "the end user — the prioritized list is."
+            )
             st.json(ranking)
+        within = art["metrics"].get("test_ranking_within_network")
+        if within:
+            st.write("**Ranking quality inside a network** (how the tool is actually used)")
+            st.caption(
+                "Top-N within one network, restricted to networks large enough for N to be a "
+                "real constraint. Lower than the national figure above, because schools inside "
+                "one network are more alike — this is the number to expect in the field."
+            )
+            st.json(within)
         st.write(f"Selected model: **{art['metrics'].get('selected_model', 'n/a')}**")
         csv_path = (
             Path(__file__).resolve().parents[1]

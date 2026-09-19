@@ -7,7 +7,7 @@
 | **Publisher** | Living Stone Foundation — Applied Data Lab |
 | **Document** | `spec.md` |
 | **Status** | Revised after a validity review found the models did not beat a trivial baseline — see `docs/validity_and_english_revision.md` |
-| **Version** | `3.0.0` |
+| **Version** | `3.1.0` |
 | **Language** | English (canonical: code, data columns, and documentation) |
 | **Random seed** | `RANDOM_STATE = 42` |
 | **Data** | INEP School Census + School Attainment Rates (Brazil) |
@@ -85,10 +85,37 @@ Splitting:
 
 Primary metrics: **MAE**, **RMSE**, **R2** on held-out rows, on both splits
 above. Secondary metrics: precision@k / recall@k / lift / average precision
-against the mart's `high_risk` label (triage-ranking quality).
+against the mart's `high_risk` label (national triage-ranking quality), plus
+precision@N **within each education network** (`test_ranking_within_network`),
+which is the metric that matches the deployed decision rule below. Networks no
+larger than N are excluded from it: their precision@N equals their base rate by
+construction.
 
 XAI: native importances / absolute coefficients, with permutation importance
 as fallback.
+
+## 5b. Decision rule (product)
+
+The rule the product applies is **capacity-constrained Top-N within one
+education network** (`src/prioritize.py`), decided by the Foundation in
+Milestone 1 and recorded in `docs/milestone1_high_risk_criteria.md` §6:
+
+1. Filter to one scope — a network the field team actually works in.
+2. Rank by `pred_dropout_rate`, with a deterministic tie-break.
+3. Take the top N, where **N is follow-up capacity**, set by the field
+   implementation team. Default 50; presets 20 / 50 / 100; adjustable.
+
+Non-negotiables:
+- **No threshold on the dropout rate** as the product rule. A fixed cut is not
+  comparable between Fundamental and Medio, which is why it was rejected.
+- **N is a count, never a percentage.** A percentile cut reintroduces the same
+  cross-level incomparability.
+- **`high_risk` / `assign_risk_bands` stay exactly as they are** — a historical
+  and evaluation label, never shown to end users.
+- **Scope granularity is selectable, and the default is the state network.**
+  The median municipal network holds 3 schools, so N = 50 there is not a
+  constraint; when the chosen scope is smaller than N, the product must say so
+  rather than present the whole network as prioritized.
 
 ## 6. Required limitation statement
 
@@ -114,3 +141,22 @@ as fallback.
 - [x] Docs rewritten in English throughout (code, columns, comments, docs)
 - [x] `docs/scope_revision.md` (2026-07-29 scope pivot) and
       `docs/validity_and_english_revision.md` (this revision) for the team lead
+
+## 8. Definition of Done (v3.1.0 — Milestone 1 tasks 6-7)
+
+- [x] Top-N decision rule implemented as a reusable, tested module
+      (`src/prioritize.py`, `tests/test_prioritize.py`), separate from the
+      model artifacts so the rule can change without touching inference
+- [x] Scope hierarchy (state network / municipality / municipal network /
+      pooled municipalities) with the state network as default, and an explicit
+      message whenever the scope is smaller than N
+- [x] N adjustable by the end user, default 50, presets 20 / 50 / 100
+- [x] `high_risk` removed from the end-user surface and unchanged in the ETL
+      (`tests/test_risk_bands.py` passes unmodified)
+- [x] Full-selection scoring — no silent row cap before ranking
+- [x] Deterministic tie-break, verified by test and on the real 2025 marts
+- [x] Within-network ranking metric in `models/{level}/metrics.json`
+- [x] Network-level evidence for the Foundation
+      (`scripts/analyze_network_prioritization.py`)
+- [ ] Pilot network chosen with a committed stakeholder, and N sized against
+      their actual capacity (blocked on the Foundation)
