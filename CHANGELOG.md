@@ -46,6 +46,23 @@ network**, not a threshold on the dropout rate. No model was retrained;
 - App: the prioritized list is now the first tab; school-name search moved out
   of the filters, since searching before ranking silently redefined "top 50".
 
+### Metrics for non-technical readers
+
+- The "Model insights" tabs and the Model Results Lab showed raw JSON, raw
+  column names (`cv_mae_mean`, `priority_rank`), matplotlib charts in white
+  boxes on the dark theme, and MAE/RMSE/R2 jargon. New `app/metric_views.py`
+  replaces them with cards (model vs baseline), Altair charts that follow the
+  light/dark theme, one-sentence readings, and formatted tables with plain
+  column names. The JSON is still available in a collapsed "Technical details"
+  expander. Covers all six Lab tabs, the "Compare both" view, and the
+  prioritized list, whose on-screen columns are now readable (the downloaded
+  CSV keeps the full machine-readable columns).
+- Ranking quality is now compared against picking schools **at random** (the
+  label's base rate), not against the baseline model. The baseline predicts a
+  constant, so its "ranking" only reflected row order in the file (lift 1.42),
+  which read as a real effect. The stored baseline ranking numbers are
+  unchanged in `metrics.json`; they are simply no longer presented.
+
 ### Deployability
 
 The app could not be hosted at all: `.gitignore` excluded both the mart

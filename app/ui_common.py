@@ -11,6 +11,12 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+from app.metric_views import (
+    render_drivers,
+    render_error_comparison,
+    render_ranking_quality,
+    render_within_network,
+)
 from src.inference import load_artifacts, predict_frame, score_single
 from src.prioritize import (
     ADMIN_DEPENDENCY_LABELS,
@@ -25,7 +31,7 @@ from src.prioritize import (
     low_signal_message,
     prioritize,
 )
-from src.utils import LIMITATION_STATEMENT, resolve_app_mart_path
+from src.utils import LEVEL_DISPLAY_NAME, LIMITATION_STATEMENT, resolve_app_mart_path
 
 ADMIN_DEPENDENCY_OPTIONS = {"Federal": 1, "State": 2, "Municipal": 3, "Private": 4}
 LOCATION_OPTIONS = {"Urban": 1, "Rural": 2}
@@ -122,6 +128,42 @@ def _uncertainty_caption(art: dict) -> str:
         f"Typical error on held-out schools is about **+/-{mae:.1f} percentage points** "
         "(hold-out MAE). Treat this as a risk *ranking* signal, not a precise forecast."
     )
+
+
+# What a person reads in the on-screen list. The downloaded CSV keeps the full
+# machine-readable columns (ids, version stamps) for traceability; the screen
+# shows only what helps decide where to go first, under plain names.
+LIST_DISPLAY_COLUMNS = {
+    "priority_rank": "Rank",
+    "school_name": "School",
+    "municipality_name": "Municipality",
+    "scope_label": "Network",
+    "pred_dropout_rate": "Predicted dropout (%)",
+    "students_at_risk_estimate": "Est. students dropping out",
+    "dropout_rate_lag1": "Dropout last year (%)",
+    "enrollment_level": "Students enrolled",
+    "scope_size": "Schools in network",
+}
+LIST_COLUMN_CONFIG = {
+    "Rank": st.column_config.NumberColumn(width="small", format="%d"),
+    "Predicted dropout (%)": st.column_config.NumberColumn(
+        format="%.1f", help="The model's estimate of this school's dropout rate."
+    ),
+    "Est. students dropping out": st.column_config.NumberColumn(
+        format="%.0f",
+        help="Predicted dropout rate x students enrolled. A rough size of the problem.",
+    ),
+    "Dropout last year (%)": st.column_config.NumberColumn(format="%.1f"),
+    "Students enrolled": st.column_config.NumberColumn(format="%d"),
+    "Schools in network": st.column_config.NumberColumn(
+        format="%d", help="How many schools this ranking was drawn from."
+    ),
+}
+
+
+def _friendly_list(frame: pd.DataFrame) -> pd.DataFrame:
+    keep = [c for c in LIST_DISPLAY_COLUMNS if c in frame.columns]
+    return frame[keep].rename(columns=LIST_DISPLAY_COLUMNS)
 
 
 def _render_prioritization_tab(level: str, art: dict) -> None:
@@ -296,7 +338,12 @@ def _render_prioritization_tab(level: str, art: dict) -> None:
         st.warning(weak)
 
     st.caption(_uncertainty_caption(art))
-    st.dataframe(result.frame, width="stretch", hide_index=True)
+    st.dataframe(
+        _friendly_list(result.frame),
+        width="stretch",
+        hide_index=True,
+        column_config=LIST_COLUMN_CONFIG,
+    )
     st.download_button(
         f"Download this prioritized list ({result.n_selected} schools, CSV)",
         result.to_csv_bytes(),
@@ -305,7 +352,25 @@ def _render_prioritization_tab(level: str, art: dict) -> None:
     )
 
     with st.expander("Per-network detail (pool size vs schools selected)"):
-        st.dataframe(result.scope_summary, width="stretch", hide_index=True)
+        detail = result.scope_summary.rename(
+            columns={
+                "scope_label": "Network",
+                "scope_size": "Schools in network",
+                "n_selected": "Schools listed",
+                "scope_fully_covered": "Whole network listed?",
+                "mean_pred_selected": "Predicted dropout, listed (%)",
+                "mean_pred_pool": "Predicted dropout, network (%)",
+            }
+        ).drop(columns=["scope_key"], errors="ignore")
+        st.dataframe(
+            detail,
+            width="stretch",
+            hide_index=True,
+            column_config={
+                "Predicted dropout, listed (%)": st.column_config.NumberColumn(format="%.2f"),
+                "Predicted dropout, network (%)": st.column_config.NumberColumn(format="%.2f"),
+            },
+        )
 
     with st.expander("Look up a specific school (does not change the list above)"):
         # Deliberately separate from the filters: the old version searched by
@@ -336,10 +401,34 @@ def _render_prioritization_tab(level: str, art: dict) -> None:
                 if c in hits.columns
             ]
             st.caption(f"{len(hits):,} matching schools in {year_filter}.")
+            found = (
+                hits[show_cols]
+                .sort_values("pred_dropout_rate", ascending=False)
+                .head(200)
+                .rename(
+                    columns={
+                        "school_id": "School code",
+                        "school_name": "School",
+                        "municipality_name": "Municipality",
+                        "state_code": "State",
+                        "pred_dropout_rate": "Predicted dropout (%)",
+                        "target_dropout_rate": "Actual dropout (%)",
+                        "dropout_rate_lag1": "Dropout last year (%)",
+                        "enrollment_level": "Students enrolled",
+                    }
+                )
+            )
             st.dataframe(
-                hits[show_cols].sort_values("pred_dropout_rate", ascending=False).head(200),
+                found,
                 width="stretch",
                 hide_index=True,
+                column_config={
+                    "School code": st.column_config.TextColumn(),
+                    "Predicted dropout (%)": st.column_config.NumberColumn(format="%.1f"),
+                    "Actual dropout (%)": st.column_config.NumberColumn(format="%.1f"),
+                    "Dropout last year (%)": st.column_config.NumberColumn(format="%.1f"),
+                    "Students enrolled": st.column_config.NumberColumn(format="%d"),
+                },
             )
 
 
@@ -509,47 +598,32 @@ def run_app(level: str, title: str) -> None:
                 )
             else:
                 st.metric("Predicted dropout rate (%)", f"{pred:.2f}")
-            st.json(result)
+            st.caption(
+                f"Model: {result.get('selected_model')} · version {result.get('model_version')} "
+                f"· {LEVEL_DISPLAY_NAME.get(level, level)}"
+            )
+            with st.expander("Technical details (raw JSON)"):
+                st.json(result)
 
     with tabs[3]:
-        st.subheader("Hold-out metrics & drivers")
+        st.subheader("How well does the model work?")
         tm = art["metrics"].get("test_metrics", {})
         bm = art["metrics"].get("baseline_test_metrics", {})
         beats = art["metrics"].get("beats_baseline_test")
-        c1, c2 = st.columns(2)
-        with c1:
-            st.write("**Model**")
-            st.json(tm)
-        with c2:
-            st.write("**Trivial baseline** (always predict the training mean)")
-            st.json(bm)
-        if beats is not None:
-            if beats:
-                st.success("The selected model beats the trivial baseline on held-out schools.")
-            else:
-                st.error(
-                    "The selected model does NOT beat the trivial baseline on held-out schools. "
-                    "Treat predictions with caution — see docs/validity_and_english_revision.md."
-                )
+        st.write("**How far off is the model?** Tested on schools it never saw during training.")
+        render_error_comparison(tm, bm)
+        if beats is False:
+            st.caption("See docs/validity_and_english_revision.md for the full analysis.")
+
         ranking = art["metrics"].get("test_ranking_metrics")
         if ranking:
-            st.write("**Triage ranking quality** (top-decile lift over random selection)")
-            st.caption(
-                "Measured against the mart's `high_risk` label, which the Foundation kept as a "
-                "historical/evaluation label. It is not the product rule and is not shown to "
-                "the end user — the prioritized list is."
-            )
-            st.json(ranking)
+            st.write("**Does sorting by predicted risk find the right schools?**")
+            render_ranking_quality(ranking, key=f"{level}_insights")
         within = art["metrics"].get("test_ranking_within_network")
         if within:
-            st.write("**Ranking quality inside a network** (how the tool is actually used)")
-            st.caption(
-                "Top-N within one network, restricted to networks large enough for N to be a "
-                "real constraint. Lower than the national figure above, because schools inside "
-                "one network are more alike — this is the number to expect in the field."
-            )
-            st.json(within)
-        st.write(f"Selected model: **{art['metrics'].get('selected_model', 'n/a')}**")
+            st.write("**And inside one network** — how the tool is actually used")
+            render_within_network(within, key=f"{level}_insights")
+
         csv_path = (
             Path(__file__).resolve().parents[1]
             / "models"
@@ -558,15 +632,22 @@ def run_app(level: str, title: str) -> None:
             / "global_importance_top.csv"
         )
         if csv_path.exists():
-            imp = pd.read_csv(csv_path)
-            st.bar_chart(imp.set_index("feature")["importance"].head(12))
-            st.dataframe(imp.head(15))
-        st.info(
-            "Compare Fundamental vs Medio drivers using notebook "
-            "`notebooks/04_compare_fundamental_vs_medio.ipynb`."
-        )
+            st.write("**What does the model pay most attention to?**")
+            render_drivers(pd.read_csv(csv_path), key=f"{level}_insights")
+
+        with st.expander("Technical details (raw JSON)"):
+            st.json(
+                {
+                    "selected_model": art["metrics"].get("selected_model"),
+                    "model": tm,
+                    "baseline": bm,
+                    "ranking": ranking,
+                    "within_network": within,
+                }
+            )
 
     st.divider()
     st.caption(
-        f"model_version={art['model_version']} | level={level} | {LIMITATION_STATEMENT}"
+        f"{LEVEL_DISPLAY_NAME.get(level, level)} · model version {art['model_version']}"
     )
+    st.caption(LIMITATION_STATEMENT)

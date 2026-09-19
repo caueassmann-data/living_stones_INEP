@@ -456,8 +456,8 @@ def coverage_message(result: PrioritizationResult) -> str | None:
         )
     return (
         f"{covered} of {n_scopes} networks in this selection have {top_n} schools or fewer, "
-        "so their whole network is listed rather than a prioritized subset. Column "
-        "`scope_fully_covered` marks them."
+        "so their whole network is listed rather than a prioritized subset. The "
+        "“Per-network detail” section below shows which ones."
     )
 
 
